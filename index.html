@@ -56,15 +56,18 @@ button{cursor:pointer;font-family:inherit}
   backdrop-filter: blur(18px);
   border-top: 1px solid var(--br2);
   padding: 10px 16px 14px;
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, auto) minmax(220px, 1fr) minmax(0, auto);
   align-items: center;
+  justify-items: stretch;
   gap: 10px;
 }
 .bb-left {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   flex-shrink: 0;
+  min-width: 0;
 }
 .bb-label {
   font-size: 10px;
@@ -84,17 +87,47 @@ button{cursor:pointer;font-family:inherit}
   text-align: center;
 }
 .bb-center {
-  flex: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 8px;
+  min-width: 240px;
 }
 .bb-right {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  justify-content: flex-end;
+}
+.tog-pre {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  color: var(--tx2);
+  cursor: pointer;
+  user-select: none;
+}
+.tog-pre input{display:none}
+.tog-track {
+  width: 36px;
+  height: 18px;
+  border-radius: 999px;
+  border: 1px solid var(--br2);
+  background: var(--s3);
+  position: relative;
+  transition: background .18s,border-color .18s;
+}
+.tog-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--tx);
+  position: absolute;
+  top: 1px;
+  left: 1px;
+  transition: left .18s,right .18s;
 }
 .bb-btn {
   display: inline-flex;
@@ -196,12 +229,12 @@ pcwrap{text-align:center}
 @media(max-width:500px){.mdk{min-height:40px}.mdk::after{width:13px;height:13px}}
 
 /* CELLS */
-.cell{flex:1;height:72px;border-radius:5px;background:var(--s3);
+.cell{flex:1;height:62px;border-radius:5px;background:var(--s3);
   border:1px solid var(--br);position:relative;overflow:hidden;
   transition:background .14s,border-color .14s;cursor:default;
   display:flex;align-items:center;justify-content:center}
-@media(max-width:600px) and (orientation:portrait){.cell{height:64px}.nota svg{height:58px}}
-@media(max-width:900px) and (orientation:landscape){.cell{height:44px}.nota{min-height:44px;padding:2px 4px}.nota svg{height:44px}.bgrp-label{padding:2px 0 1px;font-size:7px}.bgrp-cells{gap:1px;padding:2px}.bgrp-dots{padding:2px 2px 3px}.mdk{min-height:20px}.mdk::after{width:7px;height:7px}}
+@media(max-width:600px) and (orientation:portrait){.cell{height:52px}.nota svg{height:58px}}
+@media(max-width:900px) and (orientation:landscape){.cell{height:38px}.nota{min-height:44px;padding:2px 4px}.nota svg{height:44px}.bgrp-label{padding:2px 0 1px;font-size:7px}.bgrp-cells{gap:1px;padding:2px}.bgrp-dots{padding:2px 2px 3px}.mdk{min-height:20px}.mdk::after{width:7px;height:7px}}
 .cell.clickable{cursor:pointer}
 .cell.clickable:hover,.cell.filled{cursor:pointer}
 .cell.filled:hover{opacity:.82}
@@ -290,7 +323,7 @@ pcwrap{text-align:center}
   .pi-ico{width:36px;height:36px}
   .pi-name{font-size:9px}
   .pw{margin-top:5px}
-  .fbarea{min-height:0;margin:3px 0}
+  .fbarea{min-height:28px;margin:3px 0}
   .fbmsg{padding:5px 10px;font-size:11px}
 }
 
@@ -322,11 +355,12 @@ pcwrap{text-align:center}
 .pi-bd{height:4px;flex:1;border-radius:1px;border:1px solid}
 
 /* FEEDBACK */
-.fbarea{min-height:0;display:flex;align-items:center;justify-content:center;margin:6px 0}
-.fbmsg{display:flex;align-items:center;gap:7px;background:var(--s2);
-  border:1px solid var(--br);border-radius:9px;padding:8px 14px;
+.fbarea{display:none}
+.fbmsg{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;background:var(--s2);
+  border:1px solid var(--br);border-radius:9px;padding:10px 16px;
   font-size:12px;font-weight:500;font-family:'Noto Sans TC',sans-serif;
-  transform:translateY(6px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
+  width:min(92%,380px);max-width:380px;box-shadow:0 12px 30px rgba(0,0,0,.25);
+  transform:translateX(-50%) translateY(16px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
 .fbmsg.show{transform:translateY(0);opacity:1}
 .fbmsg.ok{border-color:rgba(163,230,53,.4);background:rgba(163,230,53,.07)}
 .fbmsg.info{border-color:rgba(79,143,255,.35);background:rgba(79,143,255,.06)}
@@ -340,10 +374,9 @@ pcwrap{text-align:center}
 .cf{position:fixed;border-radius:2px;pointer-events:none;z-index:9998;animation:fall linear forwards}
 
 /* HIDDEN PANEL */
-.hpanel{display:none}.hpanel.show{display:block}
+.hpanel{display:block}
 @media(max-width:600px){
   #main{max-width:100%;padding:10px 8px 80px}
-  .ctrlbar{gap:5px;padding:8px 10px;flex-wrap:wrap}
   .bpmw{gap:4px;font-size:10px}
   .bpmw span{display:none}
   .bpms{width:50px}
@@ -397,13 +430,9 @@ pcwrap{text-align:center}
 </div>
 
 <!-- ANSWER SECTION -->
-<div class="sec-card" id="acard">
+<div class="sec-card" id="acard" style="display:none;">
   <div class="sec-hdr">
     <div class="sec-title">✏️ 學生作答</div>
-    <div class="sec-btns">
-      <button class="btn btn-ok" id="btnCheck">✓ 檢查</button>
-      <button class="btn btn-gh" id="btnAReset">↺ 重置</button>
-    </div>
   </div>
   <div class="beat-area" id="agrid"></div>
   <div class="fbarea"><div class="fbmsg info" id="fbmsg">
@@ -438,8 +467,17 @@ pcwrap{text-align:center}
     <input type="range" id="bpms" min="40" max="200" value="76" class="bpms">
     <input type="number" id="bpminput" min="40" max="200" value="76" class="bb-bpmnum">
   </div>
-  <div class="bb-center" id="bbCenter"></div>
-  <div class="bb-right" id="bbRight"></div>
+  <div class="bb-center" id="bbCenter">
+    <button class="bb-btn active" onclick="switchTab('Q')">🎵 題目節奏</button>
+    <button class="bb-btn" onclick="switchTab('A')">✓ 立即測驗</button>
+  </div>
+  <div class="bb-right" id="bbRight">
+    <button class="bb-btn" onclick="toggleCross()">跨拍：關</button>
+    <button class="bb-btn" onclick="clearQ()">清除</button>
+    <button class="bb-btn" onclick="toggleMetro()">節拍器</button>
+    <button class="bb-btn" onclick="newRandom()">🎲 隨機</button>
+    <button class="bb-btn primary" id="bbPlay" onclick="playMain()">▶</button>
+  </div>
 </div>
 <script>
 // ─── AUDIO (unified pitch = G4 392Hz for all notes) ───
@@ -723,7 +761,6 @@ const QS=mkGS(),AS=mkGS();
 // ─── APP STATE ───
 const ST8={
   crossBeat:false,teacherMode:false,metroSound:false,
-  currentTab:'Q',
   selectedType:null,editTarget:'A',
   markers:Array(16).fill(false)
 };
@@ -841,7 +878,7 @@ function doDrop(ci,type,gs,pfx,isQ){
     clearPreview(pfx);
   }else{
     AU.ding(false);
-    if(crossesBeat&&!occupied)showFB('⛔ 音符不可跨拍！請開啟底部「跨拍」按鈕','warn',4000);
+    if(crossesBeat&&!occupied)showFB('⛔ 音符不可跨拍！請開啟右上「跨拍」按鈕','warn',4000);
     else showFB('此格放不下，請找空格！','hint');
     const c=D(`${pfx}${ci}`);if(c){c.classList.add('pv-bad');setTimeout(()=>c.classList.remove('pv-bad'),480);}
   }
@@ -963,7 +1000,8 @@ function playMain(){
   const pat=QS.pattern();
   if(!pat.length){showFB('先設計或隨機一個題目！','hint');return;}
   const go=()=>{
-    D('btnPlay').textContent='⏸ 播放中…';
+    const btn=D('bbPlay');
+    if(btn) btn.textContent='⏸ 播放中…';
     AU.bpm=parseInt(D('bpms').value)||76;
     if(ST8.metroSound && AU.ctx){
       const now=AU.ctx.currentTime + 0.05;
@@ -972,26 +1010,24 @@ function playMain(){
     }
     AU.playPattern(pat,
       (sc,dur)=>{for(let i=sc;i<sc+dur;i++){const c=D(`qc${i}`);if(!c)return;c.classList.add('playing');setTimeout(()=>c.classList.remove('playing'),(dur*AU.s16*1000)-25);}},
-      ()=>{D('btnPlay').innerHTML='<svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5L10 6L2 10.5V1.5Z"/></svg>播放';}
+      ()=>{const btn=D('bbPlay');if(btn)btn.innerHTML='<svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5L10 6L2 10.5V1.5Z"/></svg>播放';}
     );
   };
   if(D('togPre').checked)AU.precount(go);else go();
 }
 
 // ─── TEACHER MODE ───
-function toggleTeacher(){
-  ST8.teacherMode=!ST8.teacherMode;
-  const pal=D('tpal');
-  pal.classList.toggle('show',ST8.teacherMode);
-  if(ST8.teacherMode){selectNote(null,'Q');showFB('老師模式：選音符後點上方格子設計題目','info',5000);}
-  else{selectNote(null,'A');showFB('設計完成！可讓學生直接書寫或播放檢查','info',3500);}
-}
 function toggleMetro(){
   ST8.metroSound=!ST8.metroSound;
   renderBottomBar(ST8.currentTab);
-  showFB(ST8.metroSound?'播放時會有節拍音':'播放時不會有節拍音','info',2000);
 }
 
+function resetAnswer(){
+  AS.reset();ST8.markers.fill(false);
+  for(let i=0;i<16;i++)D(`mk${i}`)?.classList.remove('on');
+  refresh('A');for(let i=0;i<16;i++)D(`ac${i}`)?.classList.remove('c-ok','c-bad');
+  showFB('學生作答已重置','info',1800);
+}
 function clearQ(){
   QS.reset();
   refresh('Q');selectNote(null,'A');showFB('題目已清除','info',2000);
@@ -1064,12 +1100,6 @@ function toggleCross(){
   renderBottomBar(ST8.currentTab);
   showFB(ST8.crossBeat?'跨拍已開啟：音符可橫跨節拍線':'跨拍已關閉','info',2500);
 }
-function resetAnswer(){
-  AS.reset();ST8.markers.fill(false);
-  for(let i=0;i<16;i++)D(`mk${i}`)?.classList.remove('on');
-  refresh('A');for(let i=0;i<16;i++)D(`ac${i}`)?.classList.remove('c-ok','c-bad');
-  showFB('學生作答已重置','info',1800);
-}
 // ─── PRECOUNT TOGGLE VISUAL ───
 function syncToggle(){
   const checked=D('togPre').checked;
@@ -1082,8 +1112,8 @@ function syncToggle(){
 // ─── INIT ───
 function switchTab(t){
   ST8.currentTab = t;
-  D('qcard').style.display = t==='Q'?'block':'none';
-  D('acard').style.display = t==='A'?'block':'none';
+  document.getElementById('qcard').style.display = t==='Q'?'block':'none';
+  document.getElementById('acard').style.display = t==='A'?'block':'none';
   renderBottomBar(t);
 }
 
@@ -1095,28 +1125,30 @@ function syncBPM(value){
 }
 
 function renderBottomBar(tab){
+  ST8.currentTab = tab;
   const center = D('bbCenter');
   const right = D('bbRight');
-  if(!center || !right) return;
-  if(tab === 'Q'){
-    center.innerHTML = `
-      <button class="bb-btn ${ST8.crossBeat ? 'active' : ''}" onclick="toggleCross()">
-        跨拍${ST8.crossBeat ? '：開' : '：關'}
-      </button>
+  if(!center||!right)return;
+  const activeQ = tab==='Q' ? 'active' : '';
+  const activeA = tab==='A' ? 'active' : '';
+  center.innerHTML = `
+    <button class="bb-btn ${activeQ}" onclick="switchTab('Q')">🎵 題目節奏</button>
+    <button class="bb-btn ${activeA}" onclick="switchTab('A')">✓ 立即測驗</button>
+  `;
+  if(tab==='Q'){
+    right.innerHTML = `
+      <button class="bb-btn ${ST8.crossBeat ? 'active' : ''}" onclick="toggleCross()">跨拍${ST8.crossBeat ? '：開' : '：關'}</button>
       <button class="bb-btn" onclick="clearQ()">清除</button>
       <button class="bb-btn ${ST8.metroSound ? 'active' : ''}" onclick="toggleMetro()">節拍器</button>
       <button class="bb-btn" onclick="newRandom()">🎲 隨機</button>
+      <button class="bb-btn primary" id="bbPlay" onclick="playMain()">▶</button>
     `;
-    right.innerHTML = `<button id="btnPlay" class="bb-btn primary" onclick="playMain()">▶</button>`;
   } else {
-    center.innerHTML = `
-      <button class="bb-btn" onclick="switchTab('Q')">🎵 題目節奏</button>
-      <button class="bb-btn check" onclick="checkAnswer()">✓ 立即測驗</button>
-    `;
     right.innerHTML = `
       <button class="bb-btn" onclick="resetAnswer()">清除</button>
       <button class="bb-btn ${ST8.metroSound ? 'active' : ''}" onclick="toggleMetro()">節拍器</button>
-      <button id="btnPlay" class="bb-btn primary" onclick="playMain()">▶</button>
+      <button class="bb-btn" onclick="newRandom()">🎲 隨機</button>
+      <button class="bb-btn primary" id="bbPlay" onclick="playMain()">▶</button>
     `;
   }
 }
@@ -1126,8 +1158,6 @@ function init(){
   buildPal(NOTES_ONLY,'tpal-items','Q');
   buildPal(NOTES_ONLY,'spal-items','A');
   refresh('both');
-  D('btnCheck').addEventListener('click',checkAnswer);
-  D('btnAReset').addEventListener('click',resetAnswer);
   D('bpms').addEventListener('input',e=>syncBPM(e.target.value));
   D('bpminput').addEventListener('change',e=>syncBPM(e.target.value));
   D('bpminput').addEventListener('keydown',e=>{
@@ -1141,20 +1171,9 @@ function init(){
   D('togPre').addEventListener('change',syncToggle);syncToggle();
   document.addEventListener('keydown',e=>{if(e.key==='Escape')selectNote(null,'A');});
   document.addEventListener('pointerdown',()=>AU.wake(),{passive:true});
-  ST8.teacherMode = true;
-  D('tpal').classList.add('show');
   switchTab('Q');
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>
-<div id="bottomBar">
-  <div class="bb-left">
-    <span class="bb-label">BPM</span>
-    <input type="range" id="bpms" min="40" max="200" value="76" class="bpms">
-    <input type="number" id="bpminput" min="40" max="200" value="76" class="bb-bpmnum">
-  </div>
-  <div class="bb-center" id="bbCenter"></div>
-  <div class="bb-right" id="bbRight"></div>
-</div>
 </body>
 </html>
