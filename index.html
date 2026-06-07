@@ -100,9 +100,9 @@ html.light #precount{background:rgba(253,246,237,.72)}
   padding:14px;margin-bottom:14px;transition:border-color .2s,box-shadow .2s}
 .sec-card.t-active{border-color:rgba(167,139,250,.4);box-shadow:0 0 0 2px rgba(167,139,250,.07)}
 .sec-card.s-active{border-color:rgba(79,143,255,.35);box-shadow:0 0 0 2px rgba(79,143,255,.06)}
-.sec-hdr{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.sec-hdr{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:12px;flex-wrap:wrap}
 .sec-title{font-size:12px;font-weight:700;color:var(--tx2);letter-spacing:.06em;text-transform:uppercase;font-family:'Space Mono',monospace}
-.sec-btns{display:flex;gap:5px;align-items:center;margin-left:auto;flex-wrap:wrap}
+.sec-btns{display:flex;gap:5px;align-items:center;margin-left:0;flex-wrap:wrap;margin-top:8px;width:100%}
 
 /* BEAT AREA GRID */
 .beat-area{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:6px}
@@ -136,14 +136,14 @@ html.light #precount{background:rgba(253,246,237,.72)}
   background:var(--s4);border:1px solid var(--br2);transition:all .18s;flex-shrink:0}
 .mdk.on{background:var(--mkd)}
 .mdk.on::after{background:var(--mk);border-color:var(--mk);box-shadow:0 0 5px rgba(250,204,21,.45)}
-@media(max-width:500px){.mdk{min-height:34px}.mdk::after{width:11px;height:11px}}
+@media(max-width:500px){.mdk{min-height:40px}.mdk::after{width:13px;height:13px}}
 
 /* CELLS */
 .cell{flex:1;height:50px;border-radius:3px;background:var(--s3);
   border:1px solid var(--br);position:relative;overflow:hidden;
   transition:background .14s,border-color .14s;cursor:default;
   display:flex;align-items:center;justify-content:center}
-@media(max-width:500px){.cell{height:42px}}
+@media(max-width:500px){.cell{height:48px}.nota svg{height:58px}}
 .cell.clickable{cursor:pointer}
 .cell.clickable:hover,.cell.filled{cursor:pointer}
 .cell.filled:hover{opacity:.82}
@@ -193,18 +193,18 @@ html.light #precount{background:rgba(253,246,237,.72)}
   text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:7px}
 .ptt::after{content:'';flex:1;height:1px;background:var(--br)}
 .pt-row{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
-.pi{display:flex;flex-direction:column;align-items:center;gap:3px;
+.pi{display:flex;flex-direction:column;align-items:center;gap:6px;
   background:var(--s1);border:1px solid var(--br);border-radius:9px;
-  padding:8px 9px;cursor:pointer;transition:all .18s;
-  user-select:none;min-width:62px;-webkit-tap-highlight-color:transparent}
-.pi:active{transform:scale(.94)}
-.pi.sel{transform:scale(1.06);z-index:2}
+  padding:12px 14px;cursor:pointer;transition:all .18s;
+  user-select:none;min-width:110px;min-height:64px;-webkit-tap-highlight-color:transparent}
+.pi:active{transform:scale(.96)}
+.pi.sel{transform:scale(1.03);z-index:2}
 .pi[data-type=quarter]{border-color:rgba(79,143,255,.3)}.pi[data-type=quarter]:hover,.pi[data-type=quarter].sel{border-color:var(--q);box-shadow:0 0 0 2px var(--qa),0 4px 12px var(--qg)}
 .pi[data-type=eighth]{border-color:rgba(52,211,153,.3)}.pi[data-type=eighth]:hover,.pi[data-type=eighth].sel{border-color:var(--e);box-shadow:0 0 0 2px var(--ea),0 4px 12px var(--eg)}
 .pi[data-type=sixteenth]{border-color:rgba(251,146,60,.3)}.pi[data-type=sixteenth]:hover,.pi[data-type=sixteenth].sel{border-color:var(--sv);box-shadow:0 0 0 2px var(--sva),0 4px 12px var(--svg_)}
 .pi[data-type="dotted-eighth"]{border-color:rgba(167,139,250,.3)}.pi[data-type="dotted-eighth"]:hover,.pi[data-type="dotted-eighth"].sel{border-color:var(--de);box-shadow:0 0 0 2px var(--dea),0 4px 12px var(--deg)}
 .pi[data-type$="-rest"]{border-color:rgba(107,122,153,.3)}.pi[data-type$="-rest"]:hover,.pi[data-type$="-rest"].sel{border-color:var(--r);box-shadow:0 0 0 2px var(--ra),0 4px 12px var(--rg)}
-.pi-ico{width:28px;height:28px}
+.pi-ico{width:40px;height:40px}
 .pi-name{font-size:9px;font-weight:700;text-align:center;line-height:1.2;color:var(--tx)}
 .pi-beat{display:flex;gap:2px;margin-top:1px}
 .pi-bd{height:4px;flex:1;border-radius:1px;border:1px solid}
@@ -231,9 +231,11 @@ html.light #precount{background:rgba(253,246,237,.72)}
 .hpanel{display:none}.hpanel.show{display:block}
 @media(max-width:500px){
   .btn{padding:6px 10px;font-size:10px}
-  .pi{min-width:54px;padding:7px 7px}
-  .pi-ico{width:24px;height:24px}
+  .pi{min-width:80px;padding:10px 12px}
+  .pi-ico{width:32px;height:32px}
   .pi-name{font-size:8px}
+  #stampbar{padding:7px 10px}
+  .sb-info strong{font-size:11px}
 }
 </style>
 </head>
@@ -256,7 +258,8 @@ html.light #precount{background:rgba(253,246,237,.72)}
 <div class="ctrlbar">
   <div class="bpmw">
     <span>BPM</span>
-    <input type="range" class="bpms" id="bpms" min="50" max="130" value="76">
+    <input type="range" class="bpms" id="bpms" min="40" max="200" value="76">
+    <input type="number" id="bpminput" min="40" max="200" value="76" style="width:56px;margin-left:8px;background:var(--s2);border:1px solid var(--br2);border-radius:8px;padding:4px 8px;color:var(--tx);font-family:'Space Mono',monospace;font-size:11px;text-align:center">
     <span class="bpmv" id="bpmv">76</span>
   </div>
   <div class="vsep"></div>
@@ -280,6 +283,15 @@ html.light #precount{background:rgba(253,246,237,.72)}
   <div class="sb-ico" id="sbico"></div>
   <div class="sb-info"><strong id="sbname"></strong><small id="sbhint"></small></div>
   <button class="sb-x" id="sbcancel">✕ 取消</button>
+</div>
+
+<div style="display:flex;gap:0;margin-bottom:14px;background:var(--s2);border:1px solid var(--br);border-radius:var(--rad);overflow:hidden">
+  <button id="tabQ" onclick="switchTab('Q')" style="flex:1;padding:10px;font-weight:700;font-size:13px;border:none;background:var(--q);color:#fff;cursor:pointer">
+    🎵 題目節奏
+  </button>
+  <button id="tabA" onclick="switchTab('A')" style="flex:1;padding:10px;font-weight:700;font-size:13px;border:none;background:transparent;color:var(--tx2);cursor:pointer">
+    ✏️ 學生作答
+  </button>
 </div>
 
 <!-- QUESTION SECTION -->
@@ -476,7 +488,25 @@ function renderNotaSVG(notes){
   const rests=pos.filter(n=>n.isRest);
   // beamable: eighth (cells<=2) OR dotted-eighth (cells=3, type includes dotted)
   const beam=pitch.filter(n=>n.cells<=2||n.type.includes('dotted'));
-  const hasBeam=beam.length>=2;
+  const beamGroups=[];
+  let group=[];
+  beam.forEach(n=>{
+    if(!group.length){
+      group=[n];
+    } else {
+      const prev=group[group.length-1];
+      if(n.offset===prev.offset+prev.cells){
+        group.push(n);
+      } else {
+        beamGroups.push(group);
+        group=[n];
+      }
+    }
+  });
+  if(group.length)beamGroups.push(group);
+  const hasBeam=beamGroups.some(g=>g.length>=2);
+  const beamGroupByNote=new Map();
+  beamGroups.forEach(g=>g.forEach(n=>beamGroupByNote.set(n,g)));
 
   let s=`<svg viewBox="0 0 ${W} ${H}" fill="none" xmlns="http://www.w3.org/2000/svg">`;
   // staff line
@@ -492,7 +522,8 @@ function renderNotaSVG(notes){
     // stem for all pitch notes
     s+=`<line x1="${f(n.sx)}" y1="${f(SY-NH+0.5)}" x2="${f(n.sx)}" y2="${f(ST)}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>`;
     // isolated flags (when not in beam group)
-    if(!hasBeam&&beam.includes(n)){
+    const ng=beamGroupByNote.get(n);
+    if(ng?.length===1){
       s+=`<path d="M${f(n.sx)} ${f(ST)} Q${f(n.sx+11)} ${f(ST+7)} ${f(n.sx)} ${f(ST+17)}" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>`;
       if(n.cells===1){ // 16th: double flag
         s+=`<path d="M${f(n.sx)} ${f(ST+10)} Q${f(n.sx+11)} ${f(ST+17)} ${f(n.sx)} ${f(ST+27)}" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>`;
@@ -517,16 +548,17 @@ function renderNotaSVG(notes){
     }
   });
 
-  // primary beam
-  if(hasBeam){
-    const bx1=beam[0].sx, bx2=beam[beam.length-1].sx;
+  // primary beam for adjacent beam groups only
+  beamGroups.forEach(group=>{
+    if(group.length<2)return;
+    const bx1=group[0].sx, bx2=group[group.length-1].sx;
     s+=`<rect x="${f(bx1)}" y="${f(ST-0.5)}" width="${f(bx2-bx1)}" height="${BH}" rx="1.5" fill="currentColor"/>`;
-    // secondary beam for consecutive 16th note runs
-    if(beam.some(n=>n.cells===1)){
+    // secondary beam for consecutive 16th note runs inside this group
+    if(group.some(n=>n.cells===1)){
       let rs=null,ri=-1;
-      beam.forEach((n,gi)=>{
+      group.forEach((n,gi)=>{
         const is16=n.cells===1;
-        const next16=gi<beam.length-1&&beam[gi+1].cells===1&&n.offset+n.cellsHere===beam[gi+1].offset;
+        const next16=gi<group.length-1&&group[gi+1].cells===1&&n.offset+n.cellsHere===group[gi+1].offset;
         if(is16){
           if(rs===null){rs=n.sx;ri=gi;}
           if(!next16){
@@ -542,9 +574,7 @@ function renderNotaSVG(notes){
         }
       });
     }
-    // partial secondary beam for dotted-eighth (the sixteenth after it)
-    // Already handled above since the 16th after dotted-eighth appears as a 16th in beam array
-  }
+  });
 
   s+=`</svg>`;
   return s;
@@ -821,16 +851,20 @@ const QPATS=[
   [{t:'eighth-rest',d:2},{t:'eighth',d:2},{t:'quarter',d:4},{t:'quarter-rest',d:4},{t:'quarter',d:4}],
   [{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'eighth',d:2},{t:'eighth',d:2},{t:'quarter',d:4},{t:'eighth',d:2},{t:'eighth',d:2}],
   [{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'quarter',d:4},{t:'eighth',d:2},{t:'eighth',d:2},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1}],
-  [{t:'quarter',d:4},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1}],
-  [{t:'quarter-rest',d:4},{t:'eighth',d:2},{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'quarter',d:4},{t:'eighth',d:2},{t:'eighth',d:2}],
-  [{t:'eighth',d:2},{t:'dotted-eighth-rest',d:3},{t:'sixteenth',d:1},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'eighth-rest',d:2}],
-  [{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'eighth',d:2},{t:'eighth',d:2}],
+  [{t:'quarter',d:4},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'eighth',d:2},{t:'eighth',d:2},{t:'quarter',d:4}],
+  [{t:'eighth-rest',d:2},{t:'eighth',d:2},{t:'eighth-rest',d:2},{t:'eighth',d:2},{t:'eighth-rest',d:2},{t:'eighth',d:2},{t:'quarter',d:4}],
+  [{t:'sixteenth',d:1},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'eighth',d:2},{t:'quarter',d:4}],
 ];
 function newRandom(){
   QS.reset();ST8.qHidden=false;
   D('btnHide').textContent='👁 隱藏';D('btnHide').classList.remove('btn-warn');
   const raw=QPATS[Math.floor(Math.random()*QPATS.length)];
-  let cell=0;raw.forEach(n=>{QS.place(cell,n.t,true);cell+=n.d;});
+  let cell=0;raw.forEach(n=>{if(cell+n.d<=16){QS.place(cell,n.t,true);cell+=n.d;}});
+  while(cell<16){
+    const fill='sixteenth';
+    QS.place(cell,fill,true);
+    cell+=1;
+  }
   refresh('Q');showFB('新題目！按播放讓學生聽寫','ok',3000);
 }
 
@@ -879,7 +913,10 @@ function toggleTheme(){
 // ─── CROSS-BEAT ───
 function toggleCross(){
   ST8.crossBeat=!ST8.crossBeat;
-  D('btnCross').classList.toggle('on',ST8.crossBeat);
+  const btn=D('btnCross');
+  btn.classList.toggle('on',ST8.crossBeat);
+  btn.textContent=ST8.crossBeat?'跨拍：開':'跨拍：關';
+  refresh('both');
   showFB(ST8.crossBeat?'跨拍已開啟：音符可橫跨節拍線':'跨拍已關閉','info',2500);
 }
 // ─── PRECOUNT TOGGLE VISUAL ───
@@ -892,6 +929,15 @@ function syncToggle(){
 }
 
 // ─── INIT ───
+function switchTab(t){
+  document.getElementById('qcard').style.display = t==='Q'?'block':'none';
+  document.getElementById('acard').style.display = t==='A'?'block':'none';
+  document.getElementById('tabQ').style.background = t==='Q'?'var(--q)':'transparent';
+  document.getElementById('tabQ').style.color = t==='Q'?'#fff':'var(--tx2)';
+  document.getElementById('tabA').style.background = t==='A'?'var(--q)':'transparent';
+  document.getElementById('tabA').style.color = t==='A'?'#fff':'var(--tx2)';
+}
+
 function init(){
   AU.init();
   const NOTES=['quarter','eighth','dotted-eighth','sixteenth'];
@@ -914,13 +960,40 @@ function init(){
   D('sbcancel').addEventListener('click',()=>selectNote(null,'A'));
   D('btnTheme').addEventListener('click',toggleTheme);
   D('btnCross').addEventListener('click',toggleCross);
-  D('bpms').addEventListener('input',e=>{D('bpmv').textContent=e.target.value;AU.bpm=parseInt(e.target.value);});
+  D('bpms').addEventListener('input',e=>{
+    const v=e.target.value;
+    D('bpminput').value=v;
+    D('bpmv').textContent=v;
+    AU.bpm=parseInt(v);
+  });
+  D('bpminput').addEventListener('change',e=>{
+    let v=parseInt(e.target.value);
+    if(isNaN(v))v=76;
+    v=Math.max(40,Math.min(200,v));
+    D('bpminput').value=v;
+    D('bpms').value=v;
+    D('bpmv').textContent=v;
+    AU.bpm=v;
+  });
+  D('bpminput').addEventListener('keydown',e=>{
+    if(e.key==='ArrowUp'||e.key==='ArrowDown'){
+      let v=parseInt(D('bpminput').value)||76;
+      v = e.key==='ArrowUp' ? Math.min(200,v+1) : Math.max(40,v-1);
+      D('bpminput').value=v;
+      D('bpms').value=v;
+      D('bpmv').textContent=v;
+      AU.bpm=v;
+      e.preventDefault();
+    }
+  });
   D('togPre').addEventListener('change',syncToggle);syncToggle();
   document.addEventListener('keydown',e=>{if(e.key==='Escape')selectNote(null,'A');});
   document.addEventListener('pointerdown',()=>AU.wake(),{passive:true});
   showFB('歡迎！🎲 隨機出題 或 ✏️ 老師設計，播放後讓學生聽寫並填入下方！','info',7000);
+  switchTab('Q');
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>
+<button id="floatBtn" onclick="document.getElementById('btnPlay').click()" style="position:fixed;bottom:24px;right:20px;z-index:150;width:54px;height:54px;border-radius:50%;background:var(--q);border:none;color:#fff;font-size:22px;box-shadow:0 4px 18px var(--qg);display:flex;align-items:center;justify-content:center;cursor:pointer">▶</button>
 </body>
 </html>
