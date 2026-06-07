@@ -93,8 +93,9 @@ pcwrap{text-align:center}
 .sec-btns{display:flex;gap:5px;align-items:center;margin-left:0;flex-wrap:wrap;margin-top:8px;width:100%}
 
 /* BEAT AREA GRID */
-.beat-area{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:6px}
-@media(max-width:500px){.beat-area{grid-template-columns:repeat(2,1fr);gap:5px}}
+.beat-area{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px}
+@media(max-width:600px) and (orientation:portrait){.beat-area{grid-template-columns:repeat(2,1fr);gap:5px}}
+@media(max-width:900px) and (orientation:landscape){.beat-area{grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:3px}}
 
 /* BEAT GROUP */
 .bgrp{display:flex;flex-direction:column;border:1px solid var(--br);
@@ -110,7 +111,7 @@ pcwrap{text-align:center}
 .nota{background:var(--s1);padding:4px 6px 6px;min-height:75px;
   display:flex;align-items:center;justify-content:center;
   border-top:1px solid var(--br);color:var(--tx)}
-.nota.empty{min-height:0;padding:0;border:none}
+.nota.empty{min-height:32px;padding:2px;border-top:1px solid var(--br)}
 .nota svg{display:block;width:100%;height:75px;overflow:visible}
 
 /* MARKER DOTS */
@@ -131,7 +132,8 @@ pcwrap{text-align:center}
   border:1px solid var(--br);position:relative;overflow:hidden;
   transition:background .14s,border-color .14s;cursor:default;
   display:flex;align-items:center;justify-content:center}
-@media(max-width:500px){.cell{height:56px}.nota svg{height:62px}}
+@media(max-width:600px) and (orientation:portrait){.cell{height:52px}.nota svg{height:58px}}
+@media(max-width:900px) and (orientation:landscape){.cell{height:38px}.nota{min-height:44px;padding:2px 4px}.nota svg{height:44px}.bgrp-label{padding:2px 0 1px;font-size:7px}.bgrp-cells{gap:1px;padding:2px}.bgrp-dots{padding:2px 2px 3px}.mdk{min-height:20px}.mdk::after{width:7px;height:7px}}
 .cell.clickable{cursor:pointer}
 .cell.clickable:hover,.cell.filled{cursor:pointer}
 .cell.filled:hover{opacity:.82}
@@ -188,6 +190,33 @@ pcwrap{text-align:center}
 .pal-slide.enter-right{animation:slideFromLeft .28s cubic-bezier(.4,0,.2,1) forwards}
 @keyframes slideFromRight{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
 @keyframes slideFromLeft{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
+/* PALETTE INLINE ROW — Tab 和音符在同一列 */
+.pal-inline-row{display:flex;align-items:center;gap:6px}
+.pal-tabs-inline{display:flex;flex-direction:column;gap:3px;flex-shrink:0}
+.pal-tabs-inline .pal-tab{padding:8px 10px;border-radius:7px;font-size:14px;
+  min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center}
+@media(max-width:900px) and (orientation:landscape){
+  .pal-tabs-inline .pal-tab{padding:5px 8px;min-width:30px;min-height:30px;font-size:13px}
+  .pi{width:80px;min-height:100px;padding:10px 8px 8px}
+  .pi-ico{width:36px;height:36px}
+  .pi-name{font-size:9px}
+  .pw{margin-top:5px}
+  .fbarea{min-height:28px;margin:3px 0}
+  .fbmsg{padding:5px 10px;font-size:11px}
+}
+
+/* 手機橫屏整體 padding 收緊 */
+@media(max-width:900px) and (orientation:landscape){
+  #main{padding:6px 8px 10px}
+  .sec-card{padding:8px;margin-bottom:6px}
+  .sec-hdr{margin-bottom:6px;gap:4px}
+  .sec-btns{gap:4px;margin-top:4px}
+  .ctrlbar{padding:6px 10px;margin-bottom:8px}
+  .btn{padding:5px 8px;font-size:9px}
+}
+
+/* Tab switcher 原本的橫向版本在 inline 模式隱藏 */
+.pal-tabs{display:none}
 .pi{display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:8px;
   background:var(--s1);border:1px solid var(--br);border-radius:12px;
   padding:16px 12px 12px;cursor:pointer;transition:all .18s;
@@ -238,6 +267,9 @@ pcwrap{text-align:center}
   .pi{min-width:80px;padding:10px 12px}
   .pi-ico{width:32px;height:32px}
   .pi-name{font-size:8px}
+}
+@media(max-width:900px){
+  #main{padding-bottom:80px}
 }
 </style>
 </head>
@@ -290,7 +322,6 @@ pcwrap{text-align:center}
       <button class="btn btn-sec" id="btnRandom">🎲 隨機</button>
       <button class="btn btn-sec" id="btnTeacher">✏️ 老師設計</button>
       <button class="btn btn-sec" id="btnCross" title="允許音符跨越節拍線">跨拍</button>
-      <button class="btn btn-sec" id="btnHide" style="display:none">👁 隱藏</button>
       <button class="btn btn-gh" id="btnQClear" style="display:none">清除</button>
     </div>
   </div>
@@ -298,12 +329,14 @@ pcwrap{text-align:center}
   <div class="hpanel" id="tpal">
     <div style="height:1px;background:var(--br);margin:10px 0"></div>
     <div class="pw" id="tpal-pw">
-      <div class="pal-tabs">
-        <button class="pal-tab active t-note" id="tpal-tab-note" onclick="switchPalTab('t','note')">♩ 音符</button>
-        <button class="pal-tab t-rest" id="tpal-tab-rest" onclick="switchPalTab('t','rest')">𝄽 休止符</button>
-      </div>
-      <div class="pal-slide-wrap" id="tpal-wrap">
-        <div class="pal-slide" id="tpal-items"></div>
+      <div class="pal-inline-row">
+        <div class="pal-tabs-inline">
+          <button class="pal-tab active t-note" id="tpal-tab-note" onclick="switchPalTab('t','note')">♩</button>
+          <button class="pal-tab t-rest" id="tpal-tab-rest" onclick="switchPalTab('t','rest')">𝄽</button>
+        </div>
+        <div class="pal-slide-wrap" id="tpal-wrap" style="flex:1;min-width:0">
+          <div class="pal-slide" id="tpal-items"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -323,12 +356,14 @@ pcwrap{text-align:center}
     <span id="fbico">💡</span><span id="fbtxt">選擇音符後點擊格子放置；再次點擊已填格子可刪除</span>
   </div></div>
   <div class="pw">
-    <div class="pal-tabs">
-      <button class="pal-tab active t-note" id="spal-tab-note" onclick="switchPalTab('s','note')">♩ 音符</button>
-      <button class="pal-tab t-rest" id="spal-tab-rest" onclick="switchPalTab('s','rest')">𝄽 休止符</button>
-    </div>
-    <div class="pal-slide-wrap" id="spal-wrap">
-      <div class="pal-slide" id="spal-items"></div>
+    <div class="pal-inline-row">
+      <div class="pal-tabs-inline">
+        <button class="pal-tab active t-note" id="spal-tab-note" onclick="switchPalTab('s','note')">♩</button>
+        <button class="pal-tab t-rest" id="spal-tab-rest" onclick="switchPalTab('s','rest')">𝄽</button>
+      </div>
+      <div class="pal-slide-wrap" id="spal-wrap" style="flex:1;min-width:0">
+        <div class="pal-slide" id="spal-items"></div>
+      </div>
     </div>
   </div>
 </div>
@@ -615,7 +650,7 @@ const QS=mkGS(),AS=mkGS();
 
 // ─── APP STATE ───
 const ST8={
-  crossBeat:false,teacherMode:false,qHidden:false,metroSound:false,
+  crossBeat:false,teacherMode:false,metroSound:false,
   selectedType:null,editTarget:'A',
   markers:Array(16).fill(false)
 };
@@ -636,13 +671,9 @@ function renderBeats(gs,containerId,pfx,isQ,showDots){
     bg.appendChild(row);
     // notation display
     const notaDiv=el('div','nota');notaDiv.id=`${pfx}nota${beat}`;
-    if(isQ && ST8.qHidden){
-      notaDiv.classList.add('empty');
-    } else {
-      const bNotes=beatToNotes(gs,beat);
-      const svg=renderNotaSVG(bNotes);
-      if(svg){notaDiv.innerHTML=svg;}else{notaDiv.classList.add('empty');}
-    }
+    const bNotes=beatToNotes(gs,beat);
+    const svg=renderNotaSVG(bNotes);
+    if(svg){notaDiv.innerHTML=svg;}else{notaDiv.classList.add('empty');}
     bg.appendChild(notaDiv);
     // marker dots (answer only)
     if(showDots){
@@ -664,9 +695,7 @@ function renderBeats(gs,containerId,pfx,isQ,showDots){
 function buildCell(ci,pfx,gs,isQ){
   const cs=gs.cells[ci];
   const c=el('div','cell');c.id=`${pfx}${ci}`;c.dataset.i=ci;
-  if(ST8.qHidden&&isQ&&cs.type){
-    c.classList.add('qhide');c.appendChild(el('span','qmark','？'));
-  }else if(cs.type){
+  if(cs.type){
     const d=ND[cs.type];c.classList.add(d.cls,'filled');
     if(cs.isStart){
       const inn=el('div','cinner');
@@ -691,13 +720,12 @@ function buildCell(ci,pfx,gs,isQ){
 function onCellClick(ci,pfx,gs,isQ){
   AU.wake();
   const cs=gs.cells[ci];
-  if(cs.type&&!ST8.qHidden){
+  if(cs.type){
     if(isQ&&!ST8.teacherMode)return;
     gs.removeAt(ci);refresh(isQ?'Q':'A');return;
   }
   if(!ST8.selectedType)return;
   if(ST8.editTarget!==(isQ?'Q':'A'))return;
-  if(ST8.qHidden&&isQ)return;
   doDrop(ci,ST8.selectedType,gs,pfx,isQ);
 }
 
@@ -744,7 +772,6 @@ function doDrop(ci,type,gs,pfx,isQ){
 function refresh(target){
   if(target==='Q'||target==='both'){
     renderBeats(QS,'qgrid','qc',true,false);
-    D('btnHide').style.display=QS.notes.length?'':'none';
     D('btnQClear').style.display=QS.notes.length?'':'none';
   }
   if(target==='A'||target==='both'){
@@ -882,7 +909,7 @@ function toggleTeacher(){
   btn.textContent=ST8.teacherMode?'✏️ 完成設計':'✏️ 老師設計';
   pal.classList.toggle('show',ST8.teacherMode);
   if(ST8.teacherMode){selectNote(null,'Q');showFB('老師模式：選音符後點上方格子設計題目','info',5000);}
-  else{selectNote(null,'A');showFB('設計完成！可按「隱藏」再讓學生聽寫','info',3500);}
+  else{selectNote(null,'A');showFB('設計完成！可讓學生直接書寫或播放檢查','info',3500);}
 }
 function toggleMetro(){
   ST8.metroSound=!ST8.metroSound;
@@ -892,18 +919,8 @@ function toggleMetro(){
   showFB(ST8.metroSound?'播放時會有節拍音':'播放時不會有節拍音','info',2000);
 }
 
-function toggleHide(){
-  ST8.qHidden=!ST8.qHidden;
-  const btn=D('btnHide');
-  btn.textContent=ST8.qHidden?'👁 顯示':'👁 隱藏';
-  btn.classList.toggle('btn-warn',ST8.qHidden);
-  btn.classList.toggle('btn-sec',!ST8.qHidden);
-  renderBeats(QS,'qgrid','qc',true,false);
-  showFB(ST8.qHidden?'題目已隱藏，學生只能聽音頻':'題目已顯示','info',2500);
-}
 function clearQ(){
-  QS.reset();ST8.qHidden=false;
-  D('btnHide').textContent='👁 隱藏';D('btnHide').classList.remove('btn-warn');
+  QS.reset();
   refresh('Q');selectNote(null,'A');showFB('題目已清除','info',2000);
 }
 
@@ -920,8 +937,7 @@ const QPATS=[
   [{t:'sixteenth',d:1},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'eighth',d:2},{t:'quarter',d:4}],
 ];
 function newRandom(){
-  QS.reset();ST8.qHidden=false;
-  D('btnHide').textContent='👁 隱藏';D('btnHide').classList.remove('btn-warn');
+  QS.reset();
   const raw=QPATS[Math.floor(Math.random()*QPATS.length)];
   let cell=0;raw.forEach(n=>{if(cell+n.d<=16){QS.place(cell,n.t,true);cell+=n.d;}});
   while(cell<16){
@@ -996,6 +1012,17 @@ function switchTab(t){
   document.getElementById('tabA').style.color = t==='A'?'#fff':'var(--tx2)';
 }
 
+function updateMobileBar(){
+  const bar=document.getElementById('mobileBar');
+  if(!bar)return;
+  bar.style.display = window.innerWidth <= 900 ? 'flex' : 'none';
+}
+
+function syncMobileBPM(value){
+  const bpmM=D('bpms-m'); if(bpmM) bpmM.value=value;
+  const bpmvM=D('bpmv-m'); if(bpmvM) bpmvM.textContent=value;
+}
+
 function init(){
   AU.init();
   buildPal(NOTES_ONLY,'tpal-items','Q');
@@ -1004,7 +1031,6 @@ function init(){
   D('btnPlay').addEventListener('click',playMain);
   D('btnRandom').addEventListener('click',newRandom);
   D('btnTeacher').addEventListener('click',toggleTeacher);
-  D('btnHide').addEventListener('click',toggleHide);
   D('btnQClear').addEventListener('click',clearQ);
   D('btnCheck').addEventListener('click',checkAnswer);
   D('btnAReset').addEventListener('click',()=>{
@@ -1019,8 +1045,20 @@ function init(){
     const v=e.target.value;
     D('bpminput').value=v;
     D('bpmv').textContent=v;
+    syncMobileBPM(v);
     AU.bpm=parseInt(v);
   });
+  const mobileBpms=D('bpms-m');
+  if(mobileBpms){
+    mobileBpms.addEventListener('input',e=>{
+      const v=e.target.value;
+      D('bpms').value=v;
+      D('bpminput').value=v;
+      D('bpmv').textContent=v;
+      syncMobileBPM(v);
+      AU.bpm=parseInt(v);
+    });
+  }
   D('bpminput').addEventListener('change',e=>{
     let v=parseInt(e.target.value);
     if(isNaN(v))v=76;
@@ -1028,6 +1066,7 @@ function init(){
     D('bpminput').value=v;
     D('bpms').value=v;
     D('bpmv').textContent=v;
+    syncMobileBPM(v);
     AU.bpm=v;
   });
   D('bpminput').addEventListener('keydown',e=>{
@@ -1037,11 +1076,14 @@ function init(){
       D('bpminput').value=v;
       D('bpms').value=v;
       D('bpmv').textContent=v;
+      syncMobileBPM(v);
       AU.bpm=v;
       e.preventDefault();
     }
   });
   D('togPre').addEventListener('change',syncToggle);syncToggle();
+  updateMobileBar();
+  window.addEventListener('resize', updateMobileBar);
   document.addEventListener('keydown',e=>{if(e.key==='Escape')selectNote(null,'A');});
   document.addEventListener('pointerdown',()=>AU.wake(),{passive:true});
   showFB('歡迎！🎲 隨機出題 或 ✏️ 老師設計，播放後讓學生聽寫並填入下方！','info',7000);
@@ -1049,6 +1091,14 @@ function init(){
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>
-<button id="floatBtn" onclick="document.getElementById('btnPlay').click()" style="position:fixed;bottom:24px;right:20px;z-index:150;width:54px;height:54px;border-radius:50%;background:var(--q);border:none;color:#fff;font-size:22px;box-shadow:0 4px 18px var(--qg);display:flex;align-items:center;justify-content:center;cursor:pointer">▶</button>
+<div id="mobileBar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(7,11,20,.95);backdrop-filter:blur(16px);border-top:1px solid var(--br2);padding:8px 16px 12px;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px">
+  <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
+    <span style="font-size:10px;color:var(--tx3);font-family:'Space Mono',monospace">BPM</span>
+    <input type="range" class="bpms" id="bpms-m" min="40" max="200" value="76" style="width:80px">
+    <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--tx)" id="bpmv-m">76</span>
+  </div>
+  <button onclick="document.getElementById('btnPlay').click()" style="width:48px;height:48px;border-radius:50%;background:var(--q);border:none;color:#fff;font-size:20px;box-shadow:0 4px 18px var(--qg);display:flex;align-items:center;justify-content:center;flex-shrink:0">▶</button>
+  <button onclick="document.getElementById('btnRandom').click()" style="padding:10px 14px;border-radius:10px;background:var(--s3);border:1px solid var(--br2);color:var(--tx);font-size:12px;font-weight:700">🎲</button>
+</div>
 </body>
 </html>
