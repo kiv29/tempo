@@ -50,6 +50,7 @@ button{cursor:pointer;font-family:inherit}
   margin-bottom:14px;padding:10px 12px;
   background:var(--s1);border:1px solid var(--br);border-radius:var(--rad);overflow:hidden}
 .ctrlbar>*{min-width:0}
+@media(max-width:900px){.ctrlbar{display:none !important}}
 .bpmw{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);flex-shrink:1;min-width:0}
 .bpms{-webkit-appearance:none;width:82px;height:3px;border-radius:2px;
   background:var(--s3);outline:none;cursor:pointer}
@@ -193,8 +194,29 @@ pcwrap{text-align:center}
 /* PALETTE INLINE ROW — Tab 和音符在同一列 */
 .pal-inline-row{display:flex;align-items:center;gap:6px}
 .pal-tabs-inline{display:flex;flex-direction:column;gap:3px;flex-shrink:0}
-.pal-tabs-inline .pal-tab{padding:8px 10px;border-radius:7px;font-size:14px;
-  min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center}
+.pal-tabs-inline .pal-tab{
+  padding:10px;border-radius:9px;
+  min-width:46px;min-height:46px;
+  display:flex;align-items:center;justify-content:center;
+  border:1px solid var(--br2);
+  background:var(--s2);
+  color:var(--tx3);
+  transition:all .2s cubic-bezier(.34,1.56,.64,1);
+}
+.pal-tabs-inline .pal-tab svg{pointer-events:none;transition:color .2s}
+.pal-tabs-inline .pal-tab:hover{background:var(--s3);color:var(--tx2)}
+.pal-tabs-inline .pal-tab.active.t-note{
+  background:rgba(112,192,255,.15);
+  border-color:rgba(112,192,255,.5);
+  color:var(--q);
+  box-shadow:0 0 0 2px rgba(112,192,255,.1);
+}
+.pal-tabs-inline .pal-tab.active.t-rest{
+  background:rgba(138,167,212,.15);
+  border-color:rgba(138,167,212,.5);
+  color:var(--r);
+  box-shadow:0 0 0 2px rgba(138,167,212,.1);
+}
 @media(max-width:900px) and (orientation:landscape){
   .pal-tabs-inline .pal-tab{padding:5px 8px;min-width:30px;min-height:30px;font-size:13px}
   .pi{width:80px;min-height:100px;padding:10px 8px 8px}
@@ -331,8 +353,17 @@ pcwrap{text-align:center}
     <div class="pw" id="tpal-pw">
       <div class="pal-inline-row">
         <div class="pal-tabs-inline">
-          <button class="pal-tab active t-note" id="tpal-tab-note" onclick="switchPalTab('t','note')">♩</button>
-          <button class="pal-tab t-rest" id="tpal-tab-rest" onclick="switchPalTab('t','rest')">𝄽</button>
+          <button class="pal-tab active t-note" id="tpal-tab-note" onclick="switchPalTab('t','note')" title="音符">
+            <svg width="18" height="22" viewBox="0 0 34 44" fill="none">
+              <ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="currentColor"/>
+              <line x1="23" y1="34" x2="23" y2="5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button class="pal-tab t-rest" id="tpal-tab-rest" onclick="switchPalTab('t','rest')" title="休止符">
+            <svg width="16" height="22" viewBox="0 0 24 38" fill="none">
+              <path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
         </div>
         <div class="pal-slide-wrap" id="tpal-wrap" style="flex:1;min-width:0">
           <div class="pal-slide" id="tpal-items"></div>
@@ -358,8 +389,17 @@ pcwrap{text-align:center}
   <div class="pw">
     <div class="pal-inline-row">
       <div class="pal-tabs-inline">
-        <button class="pal-tab active t-note" id="spal-tab-note" onclick="switchPalTab('s','note')">♩</button>
-        <button class="pal-tab t-rest" id="spal-tab-rest" onclick="switchPalTab('s','rest')">𝄽</button>
+        <button class="pal-tab active t-note" id="spal-tab-note" onclick="switchPalTab('s','note')" title="音符">
+          <svg width="18" height="22" viewBox="0 0 34 44" fill="none">
+            <ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="currentColor"/>
+            <line x1="23" y1="34" x2="23" y2="5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+          </svg>
+        </button>
+        <button class="pal-tab t-rest" id="spal-tab-rest" onclick="switchPalTab('s','rest')" title="休止符">
+          <svg width="16" height="22" viewBox="0 0 24 38" fill="none">
+            <path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
       </div>
       <div class="pal-slide-wrap" id="spal-wrap" style="flex:1;min-width:0">
         <div class="pal-slide" id="spal-items"></div>
@@ -673,7 +713,13 @@ function renderBeats(gs,containerId,pfx,isQ,showDots){
     const notaDiv=el('div','nota');notaDiv.id=`${pfx}nota${beat}`;
     const bNotes=beatToNotes(gs,beat);
     const svg=renderNotaSVG(bNotes);
-    if(svg){notaDiv.innerHTML=svg;}else{notaDiv.classList.add('empty');}
+    if(svg){
+      notaDiv.innerHTML=svg;
+    }else{
+      notaDiv.innerHTML=`<svg viewBox="0 0 90 65" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <line x1="4" y1="50" x2="86" y2="50" stroke="currentColor" stroke-width="1" opacity=".2"/>
+      </svg>`;
+    }
     bg.appendChild(notaDiv);
     // marker dots (answer only)
     if(showDots){
@@ -1091,14 +1137,18 @@ function init(){
 }
 document.addEventListener('DOMContentLoaded',init);
 </script>
-<div id="mobileBar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(7,11,20,.95);backdrop-filter:blur(16px);border-top:1px solid var(--br2);padding:8px 16px 12px;display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:10px">
-  <div style="display:flex;align-items:center;gap:8px;flex:1;min-width:0">
-    <span style="font-size:10px;color:var(--tx3);font-family:'Space Mono',monospace">BPM</span>
-    <input type="range" class="bpms" id="bpms-m" min="40" max="200" value="76" style="width:80px">
+<div id="mobileBar" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(7,11,20,.95);backdrop-filter:blur(16px);border-top:1px solid var(--br2);padding:12px 16px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px">
+  <div style="display:flex;align-items:center;gap:10px;min-width:0;flex:1">
+    <span style="font-size:10px;color:var(--tx3);font-family:'Space Mono',monospace;letter-spacing:.02em">BPM</span>
+    <input type="range" class="bpms" id="bpms-m" min="40" max="200" value="76" style="width:96px">
     <span style="font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:var(--tx)" id="bpmv-m">76</span>
   </div>
-  <button onclick="document.getElementById('btnPlay').click()" style="width:48px;height:48px;border-radius:50%;background:var(--q);border:none;color:#fff;font-size:20px;box-shadow:0 4px 18px var(--qg);display:flex;align-items:center;justify-content:center;flex-shrink:0">▶</button>
-  <button onclick="document.getElementById('btnRandom').click()" style="padding:10px 14px;border-radius:10px;background:var(--s3);border:1px solid var(--br2);color:var(--tx);font-size:12px;font-weight:700">🎲</button>
+  <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end">
+    <button onclick="document.getElementById('btnMetro').click()" style="min-width:46px;height:46px;border-radius:14px;background:var(--s2);border:1px solid var(--br2);color:var(--tx);font-size:16px;font-weight:700">🎵</button>
+    <button onclick="document.getElementById('togPre').click()" style="min-width:46px;height:46px;border-radius:14px;background:var(--s2);border:1px solid var(--br2);color:var(--tx);font-size:16px;font-weight:700">⏱</button>
+    <button onclick="document.getElementById('btnRandom').click()" style="min-width:46px;height:46px;border-radius:14px;background:var(--s2);border:1px solid var(--br2);color:var(--tx);font-size:16px;font-weight:700">🎲</button>
+    <button onclick="document.getElementById('btnPlay').click()" style="width:52px;height:52px;border-radius:50%;background:var(--q);border:none;color:#fff;font-size:20px;box-shadow:0 6px 18px var(--qg);display:flex;align-items:center;justify-content:center;flex-shrink:0">▶</button>
+  </div>
 </div>
 </body>
 </html>
