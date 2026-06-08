@@ -71,6 +71,10 @@ button{cursor:pointer;font-family:inherit}
   min-width: 0;
   flex-wrap: wrap;
 }
+.bb-left .bpms {
+  width: 140px;
+  max-width: 260px;
+}
 .bb-center {
   display: flex;
   align-items: center;
@@ -175,10 +179,10 @@ button{cursor:pointer;font-family:inherit}
 .bb-btn.check { background: var(--ok); border-color: var(--ok); color: #0e1a00; }
 #main { padding-bottom: 90px !important; }
 .bpmw{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);flex-shrink:1;min-width:0}
-.bpms{appearance:none;-webkit-appearance:none;width:82px;height:3px;border-radius:2px;
+.bpms{appearance:none;-webkit-appearance:none;width:140px;height:4px;border-radius:3px;
   background:var(--s3);outline:none;cursor:pointer}
-.bpms::-webkit-slider-thumb{-webkit-appearance:none;width:13px;height:13px;
-  border-radius:50%;background:var(--q);cursor:pointer}
+.bpms::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
+  border-radius:50%;background:var(--q);cursor:pointer;box-shadow:0 0 0 3px rgba(112,192,255,.2)}
 .bpmv{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;min-width:28px}
 .vsep{width:1px;height:20px;background:var(--br);flex-shrink:0}
 .btn{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;
@@ -223,9 +227,10 @@ pcwrap{text-align:center}
 
 /* BEAT GROUP */
 .bgrp{display:flex;flex-direction:column;border:1px solid var(--br);
-  border-radius:8px;overflow:hidden;background:var(--s1);transition:border-color .2s}
+  border-radius:8px;overflow:hidden;background:var(--s1);transition:border-color .2s,box-shadow .2s}
 .bgrp.hover-ok{border-color:var(--br3)}
 .bgrp.beat-full{border-color:rgba(163,230,53,.45)}
+.bgrp.correct{border-color:var(--ok);box-shadow:0 0 0 2px rgba(91,211,168,.16)}
 .bgrp-label{text-align:center;padding:3px 0 2px;
   font-family:'Space Mono',monospace;font-size:8px;font-weight:700;
   color:var(--tx3);letter-spacing:.07em;background:var(--s2)}
@@ -263,6 +268,7 @@ pcwrap{text-align:center}
 .cell.filled:hover{opacity:.82}
 .cell.playing{filter:brightness(1.9);transition:filter .04s}
 .cell.nq{background:var(--qa);border-color:var(--q);color:var(--q)}
+.cell.c-ok{border-color:var(--ok)!important;background:rgba(91,211,168,.12)!important}
 .cell.ne{background:var(--ea);border-color:var(--e);color:var(--e)}
 .cell.nv{background:var(--sva);border-color:var(--sv);color:var(--sv)}
 .cell.nd{background:var(--dea);border-color:var(--de);color:var(--de)}
@@ -304,7 +310,7 @@ pcwrap{text-align:center}
 
 /* PALETTE SLIDE CONTAINER */
 .pal-slide-wrap{position:relative;overflow:visible}
-.pal-slide{display:flex;gap:8px;padding-left:3px;padding-top:3px;padding-bottom:6px;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;
+.pal-slide{display:flex;justify-content:center;gap:8px;padding-left:3px;padding-top:3px;padding-bottom:6px;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;
   transition:opacity .28s ease,transform .28s cubic-bezier(.4,0,.2,1);
   flex-wrap:nowrap}
 .pal-slide::-webkit-scrollbar{height:3px}.pal-slide::-webkit-scrollbar-track{background:transparent}.pal-slide::-webkit-scrollbar-thumb{background:var(--br3);border-radius:2px}
@@ -342,12 +348,16 @@ pcwrap{text-align:center}
 }
 @media(max-width:900px) and (orientation:landscape){
   .pal-tabs-inline .pal-tab{padding:5px 8px;min-width:30px;min-height:30px;font-size:13px}
-  .pi{width:80px;min-height:100px;padding:10px 8px 8px}
-  .pi-ico{width:36px;height:36px}
+  .pi{width:76px;min-height:92px;padding:8px 8px 8px}
+  .pi-ico{width:32px;height:32px}
   .pi-name{font-size:9px}
   .pw{margin-top:5px}
   .fbarea{min-height:28px;margin:3px 0}
   .fbmsg{padding:5px 10px;font-size:11px}
+  .cell{height:52px}
+  .nota{min-height:40px;padding:3px 4px}
+  .bgrp{border-radius:10px}
+  .bgrp-label{padding:2px 0 1px;font-size:9px}
 }
 
 /* 手機橫屏整體 padding 收緊 */
@@ -361,24 +371,24 @@ pcwrap{text-align:center}
 
 /* Tab switcher 原本的橫向版本在 inline 模式隱藏 */
 .pal-tabs{display:none}
-.pi{display:flex;flex-direction:column;align-items:center;justify-content:space-between;gap:8px;
+.pi{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
   background:var(--s1);border:1px solid var(--br);border-radius:12px;
-  padding:16px 12px 12px;cursor:pointer;transition:all .18s;
-  user-select:none;flex-shrink:0;width:108px;min-height:130px;-webkit-tap-highlight-color:transparent}
-.pi:active{transform:scale(.96)}
+  padding:14px 10px 10px;cursor:pointer;transition:all .18s;
+  user-select:none;flex-shrink:0;width:96px;min-height:115px;-webkit-tap-highlight-color:transparent}
+.pi:active{transform:scale(.98)}
 .pi.sel{transform:scale(1.03);z-index:2}
 .pi[data-type=quarter]{border-color:rgba(79,143,255,.3)}.pi[data-type=quarter]:hover,.pi[data-type=quarter].sel{border-color:var(--q);box-shadow:0 0 0 2px var(--qa),0 4px 12px var(--qg)}
 .pi[data-type=eighth]{border-color:rgba(52,211,153,.3)}.pi[data-type=eighth]:hover,.pi[data-type=eighth].sel{border-color:var(--e);box-shadow:0 0 0 2px var(--ea),0 4px 12px var(--eg)}
 .pi[data-type=sixteenth]{border-color:rgba(251,146,60,.3)}.pi[data-type=sixteenth]:hover,.pi[data-type=sixteenth].sel{border-color:var(--sv);box-shadow:0 0 0 2px var(--sva),0 4px 12px var(--svg_)}
 .pi[data-type="dotted-eighth"]{border-color:rgba(167,139,250,.3)}.pi[data-type="dotted-eighth"]:hover,.pi[data-type="dotted-eighth"].sel{border-color:var(--de);box-shadow:0 0 0 2px var(--dea),0 4px 12px var(--deg)}
 .pi[data-type$="-rest"]{border-color:rgba(107,122,153,.3)}.pi[data-type$="-rest"]:hover,.pi[data-type$="-rest"].sel{border-color:var(--r);box-shadow:0 0 0 2px var(--ra),0 4px 12px var(--rg)}
-.pi-ico{width:52px;height:52px;display:flex;align-items:center;justify-content:center}
-.pi-name{font-size:11px;font-weight:700;text-align:center;line-height:1.3;color:var(--tx);white-space:nowrap}
-.pi-beat{display:flex;gap:2px;margin-top:1px}
-.pi-bd{height:4px;flex:1;border-radius:1px;border:1px solid}
+.pi-ico{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
+.pi-name{font-size:10px;font-weight:700;text-align:center;line-height:1.3;color:var(--tx);white-space:nowrap}
+.pi-beat{display:none!important}
+.pi-bd{width:6px;height:4px;border-radius:999px;background:var(--s4);border:1px solid var(--br2)}
 
 /* FEEDBACK */
-.fbarea{display:none}
+.fbarea{display:block}
 .fbmsg{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;background:var(--s2);
   border:1px solid var(--br);border-radius:9px;padding:10px 16px;
   font-size:12px;font-weight:500;font-family:'Noto Sans TC',sans-serif;
@@ -437,7 +447,7 @@ pcwrap{text-align:center}
 
 <!-- QUESTION SECTION -->
 <div class="sec-card" id="qcard">
-  <div class="sec-title">🎵 題目節奏</div>
+  <div class="sec-title">題目節奏</div>
   <div class="beat-area" id="qgrid"></div>
   <div class="hpanel" id="tpal">
     <div style="height:1px;background:var(--br);margin:10px 0"></div>
@@ -466,36 +476,37 @@ pcwrap{text-align:center}
 
 <!-- ANSWER SECTION -->
 <div class="sec-card" id="acard" style="display:none;">
-  <div class="sec-hdr">
-    <div class="sec-title">✏️ 學生作答</div>
-  </div>
+  <div class="sec-title">立即測驗</div>
   <div class="beat-area" id="agrid"></div>
-  <div class="fbarea"><div class="fbmsg info" id="fbmsg">
-    <span id="fbico">💡</span><span id="fbtxt">選擇音符後點擊格子放置；再次點擊已填格子可刪除</span>
-  </div></div>
-  <div class="pw">
-    <div class="pal-inline-row">
-      <div class="pal-tabs-inline">
-        <button class="pal-tab active t-note" id="spal-tab-note" onclick="switchPalTab('s','note')" title="音符">
-          <svg width="18" height="22" viewBox="0 0 34 44" fill="none">
-            <ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="currentColor"/>
-            <line x1="23" y1="34" x2="23" y2="5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-          </svg>
-        </button>
-        <button class="pal-tab t-rest" id="spal-tab-rest" onclick="switchPalTab('s','rest')" title="休止符">
-          <svg width="16" height="22" viewBox="0 0 24 38" fill="none">
-            <path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </button>
-      </div>
-      <div class="pal-slide-wrap" id="spal-wrap" style="flex:1;min-width:0">
-        <div class="pal-slide" id="spal-items"></div>
+  <div class="hpanel" id="spal">
+    <div style="height:1px;background:var(--br);margin:10px 0"></div>
+    <div class="pw">
+      <div class="pal-inline-row">
+        <div class="pal-tabs-inline">
+          <button class="pal-tab active t-note" id="spal-tab-note" onclick="switchPalTab('s','note')" title="音符">
+            <svg width="18" height="22" viewBox="0 0 34 44" fill="none">
+              <ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="currentColor"/>
+              <line x1="23" y1="34" x2="23" y2="5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <button class="pal-tab t-rest" id="spal-tab-rest" onclick="switchPalTab('s','rest')" title="休止符">
+            <svg width="16" height="22" viewBox="0 0 24 38" fill="none">
+              <path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </button>
+        </div>
+        <div class="pal-slide-wrap" id="spal-wrap" style="flex:1;min-width:0">
+          <div class="pal-slide" id="spal-items"></div>
+        </div>
       </div>
     </div>
   </div>
 </div>
 
 </main>
+<div class="fbmsg info" id="fbmsg">
+  <span id="fbico">💡</span><span id="fbtxt">選擇音符後點擊格子放置；再次點擊已填格子可刪除</span>
+</div>
 <input type="checkbox" id="togPre" checked hidden>
 <div id="bottomBar">
   <div class="bb-left">
@@ -509,7 +520,7 @@ pcwrap{text-align:center}
 <script>
 // ─── AUDIO (unified pitch = G4 392Hz for all notes) ───
 const AU={
-  ctx:null, bpm:76,
+  ctx:null, bpm:60,
   FREQ:392, // G4 — all notes same pitch
   init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
   wake(){if(this.ctx?.state==='suspended')this.ctx.resume()},
@@ -825,7 +836,9 @@ function renderBeats(gs,containerId,pfx,isQ,showDots){
         const ci=beat*4+s;
         const dot=el('div','mdk');dot.id=`mk${ci}`;
         if(ST8.markers[ci])dot.classList.add('on');
-        dot.addEventListener('click',()=>toggleMark(ci));
+        if(!isQ){
+          dot.addEventListener('click',()=>toggleMark(ci));
+        }
         dr.appendChild(dot);
       }
       bg.appendChild(dr);
@@ -914,11 +927,10 @@ function doDrop(ci,type,gs,pfx,isQ){
 // ─── REFRESH ───
 function refresh(target){
   if(target==='Q'||target==='both'){
-    renderBeats(QS,'qgrid','qc',true,false);
+    renderBeats(QS,'qgrid','qc',true,true);
   }
   if(target==='A'||target==='both'){
     renderBeats(AS,'agrid','ac',false,true);
-    for(let i=0;i<16;i++)if(ST8.markers[i])D(`mk${i}`)?.classList.add('on');
   }
 }
 
@@ -951,13 +963,7 @@ function buildPal(types,cid,target){
   types.forEach(type=>{
     const d=ND[type];
     const item=el('div','pi');item.dataset.type=type;item.dataset.target=target;
-    let bv='<div class="pi-beat">';
-    for(let i=0;i<4;i++){
-      const on=i<d.cells;
-      bv+=`<div class="pi-bd ${on?'on':'off'}" style="background:${on?d.col:'var(--s4)'};border-color:${on?d.col:'var(--br2)'}"></div>`;
-    }
-    bv+='</div>';
-    item.innerHTML=`<div class="pi-ico">${PICO[type](d.col)}</div><div class="pi-name">${d.name}</div>${bv}`;
+    item.innerHTML=`<div class="pi-ico">${PICO[type](d.col)}</div><div class="pi-name">${d.name}</div>`;
     item.addEventListener('click',()=>{
       AU.wake();
       if(ST8.selectedType===type&&ST8.editTarget===target)selectNote(null,'A');
@@ -998,13 +1004,7 @@ function switchPalTab(prefix,tab){
   types.forEach(type=>{
     const d=ND[type];
     const item=el('div','pi');item.dataset.type=type;item.dataset.target=target;
-    let bv='<div class="pi-beat">';
-    for(let i=0;i<4;i++){
-      const on=i<d.cells;
-      bv+=`<div class="pi-bd ${on?'on':'off'}" style="background:${on?d.col:'var(--s4)'};border-color:${on?d.col:'var(--br2)'}"></div>`;
-    }
-    bv+='</div>';
-    item.innerHTML=`<div class="pi-ico">${PICO[type](d.col)}</div><div class="pi-name">${d.name}</div>${bv}`;
+    item.innerHTML=`<div class="pi-ico">${PICO[type](d.col)}</div><div class="pi-name">${d.name}</div>`;
     item.addEventListener('click',()=>{
       AU.wake();
       if(ST8.selectedType===type&&ST8.editTarget===target)selectNote(null,'A');
@@ -1025,10 +1025,10 @@ function switchPalTab(prefix,tab){
 function playMain(){
   AU.wake();
   const pat=QS.pattern();
-  if(!pat.length){showFB('先設計或隨機一個題目！','hint');return;}
+  if(!pat.length){showFB('先設計題目！','hint');return;}
   const go=()=>{
     const btn=D('bbPlay');
-    if(btn) btn.textContent='⏸ 播放中…';
+    if(btn) btn.textContent='▶';
     AU.bpm=parseInt(D('bpms').value)||76;
     if(ST8.metroSound && AU.ctx){
       const now=AU.ctx.currentTime + 0.05;
@@ -1037,7 +1037,7 @@ function playMain(){
     }
     AU.playPattern(pat,
       (sc,dur)=>{for(let i=sc;i<sc+dur;i++){const c=D(`qc${i}`);if(!c)return;c.classList.add('playing');setTimeout(()=>c.classList.remove('playing'),(dur*AU.s16*1000)-25);}},
-      ()=>{const btn=D('bbPlay');if(btn)btn.innerHTML='<svg width="10" height="10" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1.5L10 6L2 10.5V1.5Z"/></svg>播放';}
+      ()=>{const btn=D('bbPlay');if(btn)btn.textContent='▶';}
     );
   };
   if(D('togPre').checked)AU.precount(go);else go();
@@ -1097,15 +1097,21 @@ function newRandom(){
     QS.place(cell,fill,true);
     cell+=1;
   }
-  switchTab('Q');
-  selectNote(null,'Q');
-  refresh('Q');
-  renderBottomBar('Q');
+  if(ST8.currentTab==='Q'){
+    switchTab('Q');
+    selectNote(null,'Q');
+    refresh('Q');
+    renderBottomBar('Q');
+  } else {
+    refresh('Q');
+    selectNote(null,'A');
+    renderBottomBar('A');
+  }
 }
 
 // ─── CHECK ANSWER ───
 function checkAnswer(){
-  if(!QS.notes.length){showFB('先設計或隨機一個題目！','hint');return;}
+  if(!QS.notes.length){showFB('先設計題目！','hint');return;}
   if(!AS.isFull()){showFB('請填滿所有16格再檢查！','hint');return;}
   let ok=true;
   for(let i=0;i<16;i++){
@@ -1116,8 +1122,13 @@ function checkAnswer(){
     if(match)c.classList.add('c-ok');
     else{c.classList.add('c-bad');setTimeout(()=>c.classList.remove('c-bad'),480);}
   }
-  if(ok){showFB('✅ 完全正確！','ok',6000);AU.ding(true);confetti();D('acard').classList.add('do-glow');setTimeout(()=>D('acard').classList.remove('do-glow'),2200);}
-  else{showFB('❌ 有些地方不對，再聽一次！','warn');AU.ding(false);}
+  for(let beat=0;beat<4;beat++){
+    const grp=D(`acbg${beat}`);
+    if(!grp)continue;
+    const beatOk=Array.from({length:4},(_,i)=>QS.cells[beat*4+i].type===AS.cells[beat*4+i].type).every(Boolean);
+    grp.classList.toggle('correct',beatOk);
+  }
+  if(ok){AU.ding(true);} else {AU.ding(false);}
 }
 
 // ─── FEEDBACK ───
@@ -1190,6 +1201,7 @@ function renderBottomBar(tab){
       <button class="bb-btn tool-btn" onclick="toggleToolMenu()">工具</button>
       <div class="tool-popup" id="toolPopup">${toolMenu}</div>
       <button class="bb-btn" onclick="resetAnswer()">清除</button>
+      <button class="bb-btn check" onclick="checkAnswer()">驗證</button>
       <button class="bb-btn" onclick="newRandom()">隨機</button>
       <button class="bb-btn primary" id="bbPlay" onclick="playMain()">▶</button>
     `;
