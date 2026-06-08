@@ -61,6 +61,7 @@ button{cursor:pointer;font-family:inherit}
   align-items: center;
   justify-items: stretch;
   gap: 10px;
+  overflow: visible;
 }
 .bb-left {
   display: flex;
@@ -68,7 +69,43 @@ button{cursor:pointer;font-family:inherit}
   gap: 8px;
   flex-shrink: 0;
   min-width: 0;
+  flex-wrap: wrap;
 }
+.bb-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 240px;
+  flex-wrap: wrap;
+}
+.bb-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  justify-content: flex-end;
+  position: relative;
+  flex-wrap: wrap;
+}
+.tool-btn{position:relative;}
+.tool-popup{
+  position:absolute;
+  right:0;
+  bottom:calc(100% + 10px);
+  min-width:190px;
+  max-width:calc(100vw - 24px);
+  background:var(--s1);
+  border:1px solid var(--br);
+  border-radius:14px;
+  padding:10px;
+  display:none;
+  gap:8px;
+  box-shadow:0 18px 36px rgba(0,0,0,.32);
+  z-index:160;
+}
+.tool-popup.open{display:grid;}
+.tool-popup .bb-btn{width:100%;justify-content:flex-start;}
 .bb-label {
   font-size: 10px;
   font-family: 'Space Mono', monospace;
@@ -85,20 +122,6 @@ button{cursor:pointer;font-family:inherit}
   font-family: 'Space Mono', monospace;
   font-size: 11px;
   text-align: center;
-}
-.bb-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-width: 240px;
-}
-.bb-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  justify-content: flex-end;
 }
 .tog-pre {
   display: inline-flex;
@@ -392,6 +415,18 @@ pcwrap{text-align:center}
 @media(max-width:900px){
   #main{padding-bottom:80px}
 }
+@media(max-width:700px){
+  #bottomBar{grid-template-columns:1fr;justify-items:center;padding:12px 12px 14px;}
+  .bb-left,.bb-center,.bb-right{width:100%;justify-content:center;}
+  .bb-left{gap:10px;}
+  .bb-center{min-width:auto;}
+  .bb-right{gap:8px;}
+  .bb-btn{font-size:10px;padding:8px 10px;}
+  .bb-btn.primary{width:44px;height:44px;font-size:16px;}
+  .bb-left .bpms{width:100%;max-width:240px;}
+  .bb-bpmnum{width:52px;}
+  .tool-popup{right:0;left:auto;bottom:calc(100% + 8px);min-width:160px;max-width:100%;}
+}
 </style>
 </head>
 <body>
@@ -461,23 +496,15 @@ pcwrap{text-align:center}
 </div>
 
 </main>
+<input type="checkbox" id="togPre" checked hidden>
 <div id="bottomBar">
   <div class="bb-left">
     <span class="bb-label">BPM</span>
     <input type="range" id="bpms" min="40" max="200" value="76" class="bpms">
     <input type="number" id="bpminput" min="40" max="200" value="76" class="bb-bpmnum">
   </div>
-  <div class="bb-center" id="bbCenter">
-    <button class="bb-btn active" onclick="switchTab('Q')">🎵 題目節奏</button>
-    <button class="bb-btn" onclick="switchTab('A')">✓ 立即測驗</button>
-  </div>
-  <div class="bb-right" id="bbRight">
-    <button class="bb-btn" onclick="toggleCross()">跨拍：關</button>
-    <button class="bb-btn" onclick="clearQ()">清除</button>
-    <button class="bb-btn" onclick="toggleMetro()">節拍器</button>
-    <button class="bb-btn" onclick="newRandom()">🎲 隨機</button>
-    <button class="bb-btn primary" id="bbPlay" onclick="playMain()">▶</button>
-  </div>
+  <div class="bb-center" id="bbCenter"></div>
+  <div class="bb-right" id="bbRight"></div>
 </div>
 <script>
 // ─── AUDIO (unified pitch = G4 392Hz for all notes) ───
@@ -1021,6 +1048,21 @@ function toggleMetro(){
   ST8.metroSound=!ST8.metroSound;
   renderBottomBar(ST8.currentTab);
 }
+function togglePrecount(){
+  const checkbox=D('togPre');
+  if(!checkbox)return;
+  checkbox.checked=!checkbox.checked;
+  renderBottomBar(ST8.currentTab);
+}
+function toggleToolMenu(){
+  const popup=D('toolPopup');
+  if(!popup)return;
+  popup.classList.toggle('open');
+}
+function closeToolMenu(){
+  const popup=D('toolPopup');
+  if(popup)popup.classList.remove('open');
+}
 
 function resetAnswer(){
   AS.reset();ST8.markers.fill(false);
@@ -1030,7 +1072,8 @@ function resetAnswer(){
 }
 function clearQ(){
   QS.reset();
-  refresh('Q');selectNote(null,'A');showFB('題目已清除','info',2000);
+  refresh('Q');
+  selectNote(null,'Q');
 }
 
 // ─── RANDOM ───
@@ -1054,7 +1097,10 @@ function newRandom(){
     QS.place(cell,fill,true);
     cell+=1;
   }
-  refresh('Q');showFB('新題目！按播放讓學生聽寫','ok',3000);
+  switchTab('Q');
+  selectNote(null,'Q');
+  refresh('Q');
+  renderBottomBar('Q');
 }
 
 // ─── CHECK ANSWER ───
@@ -1098,15 +1144,6 @@ function toggleCross(){
   ST8.crossBeat=!ST8.crossBeat;
   refresh('both');
   renderBottomBar(ST8.currentTab);
-  showFB(ST8.crossBeat?'跨拍已開啟：音符可橫跨節拍線':'跨拍已關閉','info',2500);
-}
-// ─── PRECOUNT TOGGLE VISUAL ───
-function syncToggle(){
-  const checked=D('togPre').checked;
-  D('togTrack').style.background=checked?'var(--q)':'var(--s3)';
-  D('togTrack').style.borderColor=checked?'var(--q)':'var(--br2)';
-  D('togThumb').style.right=checked?'1px':'';
-  D('togThumb').style.left=checked?'':'1px';
 }
 
 // ─── INIT ───
@@ -1132,22 +1169,28 @@ function renderBottomBar(tab){
   const activeQ = tab==='Q' ? 'active' : '';
   const activeA = tab==='A' ? 'active' : '';
   center.innerHTML = `
-    <button class="bb-btn ${activeQ}" onclick="switchTab('Q')">🎵 題目節奏</button>
-    <button class="bb-btn ${activeA}" onclick="switchTab('A')">✓ 立即測驗</button>
+    <button class="bb-btn ${activeQ}" onclick="switchTab('Q')">題目節奏</button>
+    <button class="bb-btn ${activeA}" onclick="switchTab('A')">立即測驗</button>
+  `;
+  const toolMenu = `
+    <button class="bb-btn ${ST8.crossBeat ? 'active' : ''}" onclick="toggleCross();toggleToolMenu()">跨拍 ${ST8.crossBeat ? '開' : '關'}</button>
+    <button class="bb-btn ${ST8.metroSound ? 'active' : ''}" onclick="toggleMetro();toggleToolMenu()">節拍器</button>
+    <button class="bb-btn ${D('togPre')?.checked ? 'active' : ''}" onclick="togglePrecount();toggleToolMenu()">預備拍</button>
   `;
   if(tab==='Q'){
     right.innerHTML = `
-      <button class="bb-btn ${ST8.crossBeat ? 'active' : ''}" onclick="toggleCross()">跨拍${ST8.crossBeat ? '：開' : '：關'}</button>
+      <button class="bb-btn tool-btn" onclick="toggleToolMenu()">工具</button>
+      <div class="tool-popup" id="toolPopup">${toolMenu}</div>
       <button class="bb-btn" onclick="clearQ()">清除</button>
-      <button class="bb-btn ${ST8.metroSound ? 'active' : ''}" onclick="toggleMetro()">節拍器</button>
-      <button class="bb-btn" onclick="newRandom()">🎲 隨機</button>
+      <button class="bb-btn" onclick="newRandom()">隨機</button>
       <button class="bb-btn primary" id="bbPlay" onclick="playMain()">▶</button>
     `;
   } else {
     right.innerHTML = `
+      <button class="bb-btn tool-btn" onclick="toggleToolMenu()">工具</button>
+      <div class="tool-popup" id="toolPopup">${toolMenu}</div>
       <button class="bb-btn" onclick="resetAnswer()">清除</button>
-      <button class="bb-btn ${ST8.metroSound ? 'active' : ''}" onclick="toggleMetro()">節拍器</button>
-      <button class="bb-btn" onclick="newRandom()">🎲 隨機</button>
+      <button class="bb-btn" onclick="newRandom()">隨機</button>
       <button class="bb-btn primary" id="bbPlay" onclick="playMain()">▶</button>
     `;
   }
@@ -1168,7 +1211,7 @@ function init(){
       e.preventDefault();
     }
   });
-  D('togPre').addEventListener('change',syncToggle);syncToggle();
+  document.addEventListener('click',e=>{if(!e.target.closest('#bottomBar'))closeToolMenu();});
   document.addEventListener('keydown',e=>{if(e.key==='Escape')selectNote(null,'A');});
   document.addEventListener('pointerdown',()=>AU.wake(),{passive:true});
   switchTab('Q');
