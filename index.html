@@ -3,1232 +3,826 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
-<title>節奏時間軸</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<title>節拍訓練</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=Noto+Sans+TC:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-html{scroll-behavior:smooth}
 :root{
   --bg:#070b14;--s1:#111823;--s2:#151f33;--s3:#1f2b42;--s4:#28344f;
   --br:#24324f;--br2:#324666;--br3:#4563a1;
   --tx:#e5ecff;--tx2:#8ea6d1;--tx3:#6f85ae;
-  --q:#70c0ff;--qa:rgba(112,192,255,.14);--qg:rgba(112,192,255,.3);
-  --e:#6ee2b9;--ea:rgba(110,226,185,.14);--eg:rgba(110,226,185,.3);
-  --sv:#f2c46f;--sva:rgba(242,196,111,.14);--svg_:rgba(242,196,111,.3);
-  --de:#b38bff;--dea:rgba(179,139,255,.14);--deg:rgba(179,139,255,.3);
-  --r:#8aa7d4;--ra:rgba(138,167,212,.14);--rg:rgba(138,167,212,.28);
-  --ok:#5bd3a8;--err:#f48ab0;--mk:#f5d564;--mkd:rgba(245,214,100,.15);
-  --hbg:rgba(7,11,20,.9);--rad:12px;--rads:8px;--radl:18px
+  --q:#70c0ff;--qa:rgba(112,192,255,.14);--qg:rgba(112,192,255,.28);
+  --e:#6ee2b9;--ea:rgba(110,226,185,.14);
+  --sv:#f2c46f;--sva:rgba(242,196,111,.14);
+  --de:#b38bff;--dea:rgba(179,139,255,.14);
+  --h:#f8b86c;--ha:rgba(248,184,108,.14);
+  --r:#8aa7d4;--ra:rgba(138,167,212,.14);
+  --ok:#5bd3a8;--err:#f48ab0;--mk:#f5d564;--mkd:rgba(245,214,100,.14);
 }
-body{background:var(--bg);color:var(--tx);font-family:'Syne','Noto Sans TC',sans-serif;
-  min-height:100vh;overflow-x:hidden;transition:background .3s,color .3s}
+body{background:var(--bg);color:var(--tx);font-family:'Syne','Noto Sans TC',sans-serif;min-height:100vh;overflow-x:hidden}
 button{cursor:pointer;font-family:inherit}
-
-/* HEADER */
-#hdr{position:sticky;top:0;z-index:200;padding:10px 14px;
-  display:flex;align-items:center;gap:10px;
-  background:var(--hbg);backdrop-filter:blur(18px);
-  border-bottom:1px solid var(--br);transition:background .3s}
-.logo{display:flex;align-items:center;gap:8px;flex:1}
-.logo-ico{width:28px;height:28px;background:linear-gradient(135deg,var(--q),var(--de));
-  border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.logo-txt{font-size:14px;font-weight:700;letter-spacing:-.03em}
-.logo-txt span{color:var(--q)}
-.hbtns{display:flex;gap:5px;flex-shrink:0}
-.hbtn{display:flex;align-items:center;gap:4px;padding:5px 10px;
-  border-radius:var(--rads);border:1px solid var(--br2);
-  background:var(--s2);color:var(--tx2);font-size:11px;font-weight:700;
-  transition:all .18s;white-space:nowrap}
-.hbtn:hover{background:var(--s3);color:var(--tx);border-color:var(--br3)}
-.hbtn.on{background:var(--de);border-color:var(--de);color:#fff}
-
-/* MAIN */
-#main{max-width:1200px;width:min(100%,1200px);margin:0 auto;padding:20px 24px 80px}
-
-/* BOTTOM BAR */
-#bottomBar {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  z-index: 150;
-  background: rgba(7,11,20,.96);
-  backdrop-filter: blur(18px);
-  border-top: 1px solid var(--br2);
-  padding: 10px 16px 14px;
-  display: grid;
-  grid-template-columns: minmax(0, auto) minmax(220px, 1fr) minmax(0, auto);
-  align-items: center;
-  justify-items: stretch;
-  gap: 10px;
-  overflow: visible;
-}
-.bb-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
-  min-width: 0;
-  flex-wrap: wrap;
-}
-.bb-left .bpms {
-  width: 140px;
-  max-width: 260px;
-}
-.bb-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-width: 240px;
-  flex-wrap: wrap;
-}
-.bb-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-  justify-content: flex-end;
-  position: relative;
-  flex-wrap: wrap;
-}
-.tool-btn{position:relative;}
-.tool-popup{
-  position:absolute;
-  right:0;
-  bottom:calc(100% + 10px);
-  min-width:190px;
-  max-width:calc(100vw - 24px);
-  background:var(--s1);
-  border:1px solid var(--br);
-  border-radius:14px;
-  padding:10px;
-  display:none;
-  gap:8px;
-  box-shadow:0 18px 36px rgba(0,0,0,.32);
-  z-index:160;
-}
-.tool-popup.open{display:grid;}
-.tool-popup .bb-btn{width:100%;justify-content:flex-start;}
-.bb-label {
-  font-size: 10px;
-  font-family: 'Space Mono', monospace;
-  color: var(--tx3);
-  letter-spacing: .04em;
-}
-.bb-bpmnum {
-  width: 46px;
-  background: var(--s2);
-  border: 1px solid var(--br2);
-  border-radius: 8px;
-  padding: 4px 6px;
-  color: var(--tx);
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  text-align: center;
-}
-.tog-pre {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 10px;
-  color: var(--tx2);
-  cursor: pointer;
-  user-select: none;
-}
-.tog-pre input{display:none}
-.tog-track {
-  width: 36px;
-  height: 18px;
-  border-radius: 999px;
-  border: 1px solid var(--br2);
-  background: var(--s3);
-  position: relative;
-  transition: background .18s,border-color .18s;
-}
-.tog-thumb {
-  width: 14px;
-  height: 14px;
-  border-radius: 50%;
-  background: var(--tx);
-  position: absolute;
-  top: 1px;
-  left: 1px;
-  transition: left .18s,right .18s;
-}
-.bb-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  border-radius: 10px;
-  font-size: 11px;
-  font-weight: 700;
-  font-family: 'Syne', sans-serif;
-  border: 1px solid var(--br2);
-  background: var(--s2);
-  color: var(--tx2);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all .18s;
-}
-.bb-btn:hover { background: var(--s3); color: var(--tx); }
-.bb-btn.active { background: var(--q); border-color: var(--q); color: #fff; }
-.bb-btn.primary { background: var(--q); border-color: var(--q); color: #fff; border-radius: 50%; width: 48px; height: 48px; justify-content: center; padding: 0; font-size: 18px; box-shadow: 0 4px 14px var(--qg); }
-.bb-btn.primary:hover { opacity: .88; }
-.bb-btn.check { background: var(--ok); border-color: var(--ok); color: #0e1a00; }
-#main { padding-bottom: 90px !important; }
-.bpmw{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--tx2);flex-shrink:1;min-width:0}
-.bpms{appearance:none;-webkit-appearance:none;width:140px;height:4px;border-radius:3px;
-  background:var(--s3);outline:none;cursor:pointer}
-.bpms::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;
-  border-radius:50%;background:var(--q);cursor:pointer;box-shadow:0 0 0 3px rgba(112,192,255,.2)}
-.bpmv{font-family:'Space Mono',monospace;font-size:11px;font-weight:700;min-width:28px}
-.vsep{width:1px;height:20px;background:var(--br);flex-shrink:0}
-.btn{display:inline-flex;align-items:center;gap:5px;padding:6px 10px;
-  border-radius:var(--rads);font-size:10px;font-weight:700;
-  border:1px solid transparent;transition:all .18s;white-space:nowrap}
-.btn svg{flex-shrink:0}
-.btn-p{background:var(--q);color:#fff;border-color:var(--q)}
-.btn-p:hover{opacity:.88;box-shadow:0 0 10px var(--qg)}
-.btn-sec{background:var(--s2);color:var(--tx);border-color:var(--br2)}
-.btn-sec:hover{background:var(--s3);border-color:var(--br3)}
-.btn-gh{background:transparent;color:var(--tx2);border-color:var(--br)}
-.btn-gh:hover{color:var(--tx);border-color:var(--br2)}
-.btn-ok{background:var(--ok);color:#0e1a00;border-color:var(--ok)}
-.btn-ok:hover{box-shadow:0 0 9px rgba(163,230,53,.4)}
-.btn-warn{background:rgba(248,113,113,.15);color:var(--err);border-color:var(--err)}
-.btn-warn:hover{background:rgba(248,113,113,.25)}
-
-/* PRECOUNT */
-#precount{position:fixed;inset:0;display:none;align-items:center;justify-content:center;
-  z-index:300;background:rgba(0,0,0,.65);backdrop-filter:blur(5px)}
-pcwrap{text-align:center}
-.pcn{font-size:96px;font-weight:800;font-family:'Space Mono',monospace;
-  color:var(--q);opacity:0;line-height:1}
-.pcsub{font-size:15px;color:var(--tx2);margin-top:6px;font-family:'Noto Sans TC',sans-serif}
-@keyframes pcpop{0%{opacity:0;transform:scale(1.7)}18%{opacity:1;transform:scale(1)}
-  82%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.4)}}
-.pcn.run{animation:pcpop .44s ease forwards}
-
-/* SECTION CARD */
-.sec-card{background:var(--s1);border:1px solid var(--br);border-radius:var(--radl);
-  padding:14px;margin-bottom:14px;transition:border-color .2s,box-shadow .2s}
-.sec-card.t-active{border-color:rgba(167,139,250,.4);box-shadow:0 0 0 2px rgba(167,139,250,.07)}
-.sec-card.s-active{border-color:rgba(79,143,255,.35);box-shadow:0 0 0 2px rgba(79,143,255,.06)}
-.sec-hdr{display:flex;flex-direction:column;align-items:flex-start;gap:8px;margin-bottom:12px;flex-wrap:wrap}
-.sec-title{font-size:12px;font-weight:700;color:var(--tx2);letter-spacing:.06em;text-transform:uppercase;font-family:'Space Mono',monospace}
-.sec-btns{display:flex;gap:5px;align-items:center;margin-left:0;flex-wrap:wrap;margin-top:8px;width:100%}
-
-/* BEAT AREA GRID */
-.beat-area{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px}
-@media(max-width:600px) and (orientation:portrait){.beat-area{grid-template-columns:repeat(2,1fr);gap:5px}}
-@media(max-width:900px) and (orientation:landscape){.beat-area{grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:3px}}
-
-/* BEAT GROUP */
-.bgrp{display:flex;flex-direction:column;border:1px solid var(--br);
-  border-radius:8px;overflow:hidden;background:var(--s1);transition:border-color .2s,box-shadow .2s}
-.bgrp.hover-ok{border-color:var(--br3)}
-.bgrp.beat-full{border-color:rgba(163,230,53,.45)}
-.bgrp.correct{border-color:var(--ok);box-shadow:0 0 0 2px rgba(91,211,168,.16)}
-.bgrp-label{text-align:center;padding:3px 0 2px;
-  font-family:'Space Mono',monospace;font-size:8px;font-weight:700;
-  color:var(--tx3);letter-spacing:.07em;background:var(--s2)}
+#hdr{position:sticky;top:0;z-index:200;padding:9px 14px;display:flex;align-items:center;gap:8px;
+  background:rgba(7,11,20,.94);backdrop-filter:blur(18px);border-bottom:1px solid var(--br)}
+.logo{flex:1;font-size:15px;font-weight:800;letter-spacing:-.03em}.logo span{color:var(--q)}
+.ts-btn{padding:5px 9px;border-radius:7px;border:1px solid var(--br2);background:var(--s2);
+  color:var(--tx2);font-size:11px;font-weight:700;font-family:'Space Mono',monospace;transition:all .18s}
+.ts-btn:hover{background:var(--s3);color:var(--tx)}.ts-btn.on{background:var(--q);border-color:var(--q);color:#fff}
+.hdr-sep{width:1px;height:18px;background:var(--br);flex-shrink:0}
+#main{max-width:1060px;width:min(100%,1060px);margin:0 auto;padding:12px 12px 84px}
+.sec-card{background:var(--s1);border:1px solid var(--br);border-radius:16px;padding:14px;margin-bottom:12px;transition:border-color .2s}
+.sec-card.q-on{border-color:rgba(167,139,250,.32)}.sec-card.a-on{border-color:rgba(112,192,255,.32)}
+.sec-lbl{font-size:10px;font-weight:700;color:var(--tx3);letter-spacing:.09em;text-transform:uppercase;
+  font-family:'Space Mono',monospace;margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.sec-tag{padding:2px 7px;border-radius:4px;font-size:9px;background:var(--s3);color:var(--tx3);border:1px solid var(--br)}
+.beat-area{display:grid;gap:5px;margin-bottom:8px}
+.bgrp{display:flex;flex-direction:column;border:1px solid var(--br);border-radius:10px;overflow:hidden;
+  background:var(--s1);transition:border-color .2s,box-shadow .2s}
+.bgrp.full{border-color:rgba(91,211,168,.4)}
+.bgrp.correct{border-color:var(--ok);box-shadow:0 0 0 2px rgba(91,211,168,.14)}
+.bgrp-lbl{text-align:center;padding:3px 0 2px;font-family:'Space Mono',monospace;font-size:8px;
+  font-weight:700;color:var(--tx3);letter-spacing:.07em;background:var(--s2);border-bottom:1px solid var(--br)}
 .bgrp-cells{display:flex;gap:2px;padding:3px;background:var(--s2)}
-
-/* NOTATION AREA */
-.nota{background:var(--s1);padding:4px 6px 6px;min-height:75px;
-  display:flex;align-items:center;justify-content:center;
-  border-top:1px solid var(--br);color:var(--tx)}
-.nota.empty{min-height:32px;padding:2px;border-top:1px solid var(--br)}
-.nota svg{display:block;width:100%;height:75px;overflow:visible}
-
-/* MARKER DOTS */
-.bgrp-dots{display:flex;gap:2px;padding:3px 3px 5px;background:var(--s1);
-  border-top:1px solid var(--br)}
-.mdk{flex:1;min-height:30px;display:flex;align-items:center;justify-content:center;
-  cursor:pointer;border-radius:4px;transition:background .15s;
-  -webkit-tap-highlight-color:transparent}
-.mdk:active{background:rgba(250,204,21,.1)}
-.mdk::after{content:'';width:9px;height:9px;border-radius:50%;
-  background:var(--s4);border:1px solid var(--br2);transition:all .18s;flex-shrink:0}
-.mdk.on{background:var(--mkd)}
-.mdk.on::after{background:var(--mk);border-color:var(--mk);box-shadow:0 0 5px rgba(250,204,21,.45)}
-@media(max-width:500px){.mdk{min-height:40px}.mdk::after{width:13px;height:13px}}
-
-/* CELLS */
-.cell{flex:1;height:62px;border-radius:5px;background:var(--s3);
-  border:1px solid var(--br);position:relative;overflow:hidden;
-  transition:background .14s,border-color .14s;cursor:default;
-  display:flex;align-items:center;justify-content:center}
-@media(max-width:600px) and (orientation:portrait){.cell{height:52px}.nota svg{height:58px}}
-@media(max-width:900px) and (orientation:landscape){.cell{height:38px}.nota{min-height:44px;padding:2px 4px}.nota svg{height:44px}.bgrp-label{padding:2px 0 1px;font-size:7px}.bgrp-cells{gap:1px;padding:2px}.bgrp-dots{padding:2px 2px 3px}.mdk{min-height:20px}.mdk::after{width:7px;height:7px}}
-.cell.clickable{cursor:pointer}
-.cell.clickable:hover,.cell.filled{cursor:pointer}
-.cell.filled:hover{opacity:.82}
-.cell.playing{filter:brightness(1.9);transition:filter .04s}
-.cell.nq{background:var(--qa);border-color:var(--q);color:var(--q)}
-.cell.c-ok{border-color:var(--ok)!important;background:rgba(91,211,168,.12)!important}
-.cell.ne{background:var(--ea);border-color:var(--e);color:var(--e)}
-.cell.nv{background:var(--sva);border-color:var(--sv);color:var(--sv)}
-.cell.nd{background:var(--dea);border-color:var(--de);color:var(--de)}
-.cell.nrq,.cell.nre,.cell.nrv,.cell.nrd{background:var(--ra);border-color:var(--r);color:var(--r)}
-.cell.qhide{background:var(--s3)!important;border-color:var(--br)!important;cursor:default!important}
-.cell.qhide .cinner{display:none}
-.qmark{font-family:'Space Mono',monospace;font-size:14px;font-weight:700;color:var(--tx3)}
-/* preview */
-.pv-q{background:rgba(79,143,255,.1)!important;border-color:rgba(79,143,255,.6)!important;cursor:pointer!important}
-.pv-e{background:rgba(52,211,153,.1)!important;border-color:rgba(52,211,153,.6)!important;cursor:pointer!important}
-.pv-s{background:rgba(251,146,60,.1)!important;border-color:rgba(251,146,60,.6)!important;cursor:pointer!important}
-.pv-d{background:rgba(167,139,250,.1)!important;border-color:rgba(167,139,250,.6)!important;cursor:pointer!important}
-.pv-r{background:rgba(107,122,153,.1)!important;border-color:rgba(107,122,153,.6)!important;cursor:pointer!important}
-.pv-bad{background:rgba(248,113,113,.1)!important;border-color:rgba(248,113,113,.5)!important;cursor:not-allowed!important}
-/* check result */
-.cell.c-ok{border-color:var(--ok)!important;background:rgba(163,230,53,.1)!important}
+.nota{background:var(--s1);padding:4px 3px 5px;display:flex;align-items:center;justify-content:center;
+  border-top:1px solid var(--br);min-height:62px}
+.nota svg{display:block;width:100%;height:58px;overflow:visible}
+.bgrp-dots{display:flex;gap:2px;padding:3px 3px 5px;background:var(--s1);border-top:1px solid var(--br)}
+.cell{flex:1;border-radius:5px;background:var(--s3);border:1px solid var(--br);min-height:50px;
+  position:relative;overflow:hidden;transition:background .14s,border-color .14s;
+  cursor:default;display:flex;align-items:center;justify-content:center}
+.cell.clk{cursor:pointer}.cell.filled:hover{opacity:.82;cursor:pointer}
+.cell.playing{filter:brightness(2.2);transition:filter .04s}
+.cell.nh{background:var(--ha);border-color:var(--h)}.cell.nq{background:var(--qa);border-color:var(--q)}
+.cell.ne{background:var(--ea);border-color:var(--e)}.cell.nv{background:var(--sva);border-color:var(--sv)}
+.cell.nd{background:var(--dea);border-color:var(--de)}.cell.nr{background:var(--ra);border-color:var(--r)}
+.cell.pv-ok{background:rgba(112,192,255,.1)!important;border-color:rgba(112,192,255,.5)!important;cursor:pointer!important}
+.cell.pv-bad{background:rgba(248,113,113,.08)!important;border-color:rgba(248,113,113,.45)!important;cursor:not-allowed!important}
+.cell.c-ok{border-color:var(--ok)!important;background:rgba(91,211,168,.09)!important}
 @keyframes shk{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
-.cell.c-bad{animation:shk .3s ease;border-color:var(--err)!important;background:rgba(248,113,113,.1)!important}
+.cell.c-bad{animation:shk .3s ease;border-color:var(--err)!important;background:rgba(248,113,113,.09)!important}
 @keyframes cpop{0%{transform:scaleY(0);opacity:0}65%{transform:scaleY(1.1)}100%{transform:scaleY(1);opacity:1}}
-.cell.popin{animation:cpop .23s cubic-bezier(.34,1.56,.64,1);transform-origin:bottom}
-.cinner{height:100%;width:100%;display:flex;align-items:center;padding:0 3px;gap:2px;pointer-events:none}
-.cico{width:15px;height:15px;flex-shrink:0}
-.clbl{font-size:6px;font-family:'Space Mono',monospace;font-weight:700;opacity:.75;white-space:nowrap;overflow:hidden}
-
-/* PALETTE */
-.pw{margin-top:10px}
-.ptt{display:none}
-.pt-row{display:flex;flex-wrap:nowrap;gap:8px;margin-bottom:8px;overflow-x:auto;padding-bottom:6px;-webkit-overflow-scrolling:touch}
-.pt-row::-webkit-scrollbar{height:4px}
-.pt-row::-webkit-scrollbar-track{background:var(--s2)}
-.pt-row::-webkit-scrollbar-thumb{background:var(--br3);border-radius:2px}
-
-/* PALETTE TAB SWITCHER */
-.pal-tabs{display:flex;gap:0;margin-bottom:10px;background:var(--s2);border:1px solid var(--br);border-radius:10px;padding:3px;width:fit-content}
-.pal-tab{padding:6px 18px;border-radius:7px;font-size:11px;font-weight:700;font-family:'Space Mono',monospace;border:none;background:transparent;color:var(--tx3);cursor:pointer;transition:all .22s cubic-bezier(.34,1.56,.64,1);letter-spacing:.03em;white-space:nowrap}
-.pal-tab.active{background:var(--s4);color:var(--tx);box-shadow:0 2px 8px rgba(0,0,0,.35)}
-.pal-tab.active.t-note{background:linear-gradient(135deg,rgba(112,192,255,.22),rgba(110,226,185,.18));color:var(--tx);border:1px solid rgba(112,192,255,.3)}
-.pal-tab.active.t-rest{background:linear-gradient(135deg,rgba(138,167,212,.2),rgba(138,167,212,.1));color:var(--r);border:1px solid rgba(138,167,212,.35)}
-
-/* PALETTE SLIDE CONTAINER */
-.pal-slide-wrap{position:relative;overflow:visible}
-.pal-slide{display:flex;justify-content:center;gap:8px;padding-left:3px;padding-top:3px;padding-bottom:6px;overflow-x:auto;overflow-y:visible;-webkit-overflow-scrolling:touch;
-  transition:opacity .28s ease,transform .28s cubic-bezier(.4,0,.2,1);
-  flex-wrap:nowrap}
-.pal-slide::-webkit-scrollbar{height:3px}.pal-slide::-webkit-scrollbar-track{background:transparent}.pal-slide::-webkit-scrollbar-thumb{background:var(--br3);border-radius:2px}
-.pal-slide.exit-left{opacity:0;transform:translateX(-18px);pointer-events:none;position:absolute;top:0;left:0;width:100%}
-.pal-slide.exit-right{opacity:0;transform:translateX(18px);pointer-events:none;position:absolute;top:0;left:0;width:100%}
-.pal-slide.enter-left{animation:slideFromRight .28s cubic-bezier(.4,0,.2,1) forwards}
-.pal-slide.enter-right{animation:slideFromLeft .28s cubic-bezier(.4,0,.2,1) forwards}
-@keyframes slideFromRight{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:translateX(0)}}
-@keyframes slideFromLeft{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:translateX(0)}}
-/* PALETTE INLINE ROW — Tab 和音符在同一列 */
-.pal-inline-row{display:flex;align-items:center;gap:6px}
-.pal-tabs-inline{display:flex;flex-direction:column;gap:3px;flex-shrink:0}
-.pal-tabs-inline .pal-tab{
-  padding:10px;border-radius:9px;
-  min-width:46px;min-height:46px;
-  display:flex;align-items:center;justify-content:center;
-  border:1px solid var(--br2);
-  background:var(--s2);
-  color:var(--tx3);
-  transition:all .2s cubic-bezier(.34,1.56,.64,1);
-}
-.pal-tabs-inline .pal-tab svg{pointer-events:none;transition:color .2s}
-.pal-tabs-inline .pal-tab:hover{background:var(--s3);color:var(--tx2)}
-.pal-tabs-inline .pal-tab.active.t-note{
-  background:rgba(112,192,255,.15);
-  border-color:rgba(112,192,255,.5);
-  color:var(--q);
-  box-shadow:0 0 0 2px rgba(112,192,255,.1);
-}
-.pal-tabs-inline .pal-tab.active.t-rest{
-  background:rgba(138,167,212,.15);
-  border-color:rgba(138,167,212,.5);
-  color:var(--r);
-  box-shadow:0 0 0 2px rgba(138,167,212,.1);
-}
-@media(max-width:900px) and (orientation:landscape){
-  .pal-tabs-inline .pal-tab{padding:5px 8px;min-width:30px;min-height:30px;font-size:13px}
-  .pi{width:76px;min-height:92px;padding:8px 8px 8px}
-  .pi-ico{width:32px;height:32px}
-  .pi-name{font-size:9px}
-  .pw{margin-top:5px}
-  .fbarea{min-height:28px;margin:3px 0}
-  .fbmsg{padding:5px 10px;font-size:11px}
-  .cell{height:52px}
-  .nota{min-height:40px;padding:3px 4px}
-  .bgrp{border-radius:10px}
-  .bgrp-label{padding:2px 0 1px;font-size:9px}
-}
-
-/* 手機橫屏整體 padding 收緊 */
-@media(max-width:900px) and (orientation:landscape){
-  #main{padding:6px 8px 10px}
-  .sec-card{padding:8px;margin-bottom:6px}
-  .sec-hdr{margin-bottom:6px;gap:4px}
-  .sec-btns{gap:4px;margin-top:4px}
-  .btn{padding:5px 8px;font-size:9px}
-}
-
-/* Tab switcher 原本的橫向版本在 inline 模式隱藏 */
-.pal-tabs{display:none}
-.pi{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;
-  background:var(--s1);border:1px solid var(--br);border-radius:12px;
-  padding:14px 10px 10px;cursor:pointer;transition:all .18s;
-  user-select:none;flex-shrink:0;width:96px;min-height:115px;-webkit-tap-highlight-color:transparent}
-.pi:active{transform:scale(.98)}
-.pi.sel{transform:scale(1.03);z-index:2}
-.pi[data-type=quarter]{border-color:rgba(79,143,255,.3)}.pi[data-type=quarter]:hover,.pi[data-type=quarter].sel{border-color:var(--q);box-shadow:0 0 0 2px var(--qa),0 4px 12px var(--qg)}
-.pi[data-type=eighth]{border-color:rgba(52,211,153,.3)}.pi[data-type=eighth]:hover,.pi[data-type=eighth].sel{border-color:var(--e);box-shadow:0 0 0 2px var(--ea),0 4px 12px var(--eg)}
-.pi[data-type=sixteenth]{border-color:rgba(251,146,60,.3)}.pi[data-type=sixteenth]:hover,.pi[data-type=sixteenth].sel{border-color:var(--sv);box-shadow:0 0 0 2px var(--sva),0 4px 12px var(--svg_)}
-.pi[data-type="dotted-eighth"]{border-color:rgba(167,139,250,.3)}.pi[data-type="dotted-eighth"]:hover,.pi[data-type="dotted-eighth"].sel{border-color:var(--de);box-shadow:0 0 0 2px var(--dea),0 4px 12px var(--deg)}
-.pi[data-type$="-rest"]{border-color:rgba(107,122,153,.3)}.pi[data-type$="-rest"]:hover,.pi[data-type$="-rest"].sel{border-color:var(--r);box-shadow:0 0 0 2px var(--ra),0 4px 12px var(--rg)}
-.pi-ico{width:44px;height:44px;display:flex;align-items:center;justify-content:center}
-.pi-name{font-size:10px;font-weight:700;text-align:center;line-height:1.3;color:var(--tx);white-space:nowrap}
-.pi-beat{display:none!important}
-.pi-bd{width:6px;height:4px;border-radius:999px;background:var(--s4);border:1px solid var(--br2)}
-
-/* FEEDBACK */
-.fbarea{display:block}
-.fbmsg{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);display:flex;align-items:center;gap:7px;background:var(--s2);
-  border:1px solid var(--br);border-radius:9px;padding:10px 16px;
-  font-size:12px;font-weight:500;font-family:'Noto Sans TC',sans-serif;
-  width:min(92%,380px);max-width:380px;box-shadow:0 12px 30px rgba(0,0,0,.25);
-  transform:translateX(-50%) translateY(16px);opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1)}
-.fbmsg.show{transform:translateY(0);opacity:1}
-.fbmsg.ok{border-color:rgba(163,230,53,.4);background:rgba(163,230,53,.07)}
-.fbmsg.info{border-color:rgba(79,143,255,.35);background:rgba(79,143,255,.06)}
+.cell.popin{animation:cpop .22s cubic-bezier(.34,1.56,.64,1);transform-origin:bottom}
+.cinner{height:100%;width:100%;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.cico{width:22px;height:22px;flex-shrink:0}
+.mdk{flex:1;min-height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+  border-radius:4px;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.mdk::after{content:'';width:9px;height:9px;border-radius:50%;background:var(--s4);
+  border:1px solid var(--br2);transition:all .18s}
+.mdk.on{background:var(--mkd)}.mdk.on::after{background:var(--mk);border-color:var(--mk);box-shadow:0 0 5px rgba(250,204,21,.4)}
+.pal-row{display:flex;align-items:flex-start;gap:5px;margin-top:10px}
+.pal-tabs{display:flex;flex-direction:column;gap:3px;flex-shrink:0}
+.pal-tab{width:40px;height:40px;display:flex;align-items:center;justify-content:center;
+  border-radius:8px;border:1px solid var(--br2);background:var(--s2);color:var(--tx3);cursor:pointer;transition:all .2s;flex-shrink:0}
+.pal-tab:hover{background:var(--s3);color:var(--tx2)}
+.pal-tab.on.t-n{background:rgba(112,192,255,.14);border-color:rgba(112,192,255,.45);color:var(--q)}
+.pal-tab.on.t-r{background:rgba(138,167,212,.14);border-color:rgba(138,167,212,.45);color:var(--r)}
+.pal-items{display:flex;gap:5px;overflow-x:auto;padding-bottom:3px;flex:1;-webkit-overflow-scrolling:touch;align-items:flex-start}
+.pal-items::-webkit-scrollbar{height:3px}.pal-items::-webkit-scrollbar-thumb{background:var(--br3);border-radius:2px}
+.pi{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;
+  background:var(--s1);border:1px solid var(--br);border-radius:10px;padding:9px 6px 7px;
+  cursor:pointer;user-select:none;flex-shrink:0;width:82px;min-height:96px;
+  -webkit-tap-highlight-color:transparent;position:relative;transition:all .18s}
+.pi:active{transform:scale(.97)}.pi.sel{transform:scale(1.04);z-index:2}
+.pi[data-c="h"]{border-color:rgba(248,184,108,.25)}.pi[data-c="h"]:hover,.pi[data-c="h"].sel{border-color:var(--h);box-shadow:0 0 0 2px var(--ha)}
+.pi[data-c="q"]{border-color:rgba(112,192,255,.25)}.pi[data-c="q"]:hover,.pi[data-c="q"].sel{border-color:var(--q);box-shadow:0 0 0 2px var(--qa)}
+.pi[data-c="e"]{border-color:rgba(110,226,185,.25)}.pi[data-c="e"]:hover,.pi[data-c="e"].sel{border-color:var(--e);box-shadow:0 0 0 2px var(--ea)}
+.pi[data-c="s"]{border-color:rgba(242,196,111,.25)}.pi[data-c="s"]:hover,.pi[data-c="s"].sel{border-color:var(--sv);box-shadow:0 0 0 2px var(--sva)}
+.pi[data-c="d"]{border-color:rgba(179,139,255,.25)}.pi[data-c="d"]:hover,.pi[data-c="d"].sel{border-color:var(--de);box-shadow:0 0 0 2px var(--dea)}
+.pi[data-c="r"]{border-color:rgba(138,167,212,.25)}.pi[data-c="r"]:hover,.pi[data-c="r"].sel{border-color:var(--r);box-shadow:0 0 0 2px var(--ra)}
+.pi[data-c="mk"]{border-color:rgba(245,214,100,.25)}.pi[data-c="mk"]:hover,.pi[data-c="mk"].sel{border-color:var(--mk);box-shadow:0 0 0 2px var(--mkd)}
+/* palette icon wrapper */
+.pi-ico{width:40px;height:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+.pi-ico>svg{display:block;width:100%;height:100%}
+/* dot overlay on palette icon — always in DOM, hidden unless .pi.dotted */
+.pi-ico .dot-ol{position:absolute;right:-5px;top:-3px;width:13px;height:13px;pointer-events:none;display:none}
+.pi.dotted .pi-ico .dot-ol{display:block}
+.pi-name{font-size:9px;font-weight:700;text-align:center;line-height:1.3;color:var(--tx);white-space:nowrap}
+.pi.dot-btn .pi-ico{width:26px;height:26px}.pi.dot-btn{min-height:80px;width:66px;border-style:dashed}
+.pi.dot-btn.sel{border-style:solid}
+#bar{position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(7,11,20,.96);
+  backdrop-filter:blur(18px);border-top:1px solid var(--br2);padding:8px 14px 12px;
+  display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:8px}
+.bar-l{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.bar-c{display:flex;align-items:center;justify-content:center;gap:6px}
+.bar-r{display:flex;align-items:center;gap:4px;justify-content:flex-end;flex-wrap:wrap}
+.bb{display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:8px;
+  font-size:11px;font-weight:700;border:1px solid var(--br2);background:var(--s2);color:var(--tx2);
+  cursor:pointer;white-space:nowrap;transition:all .18s;font-family:'Syne',sans-serif}
+.bb:hover{background:var(--s3);color:var(--tx)}
+.bb.on{background:rgba(179,139,255,.2);border-color:var(--de);color:var(--de)}
+.bb.tab-on{background:var(--s3);border-color:var(--br3);color:var(--tx)}
+.bb.play{background:var(--q);border-color:var(--q);color:#fff;border-radius:50%;
+  width:44px;height:44px;padding:0;justify-content:center;font-size:16px;box-shadow:0 4px 12px var(--qg)}
+.bb.play:hover{opacity:.88}.bb.play-a{background:var(--e);border-color:var(--e);box-shadow:0 4px 12px rgba(110,226,185,.28)}
+.bb.check{background:var(--ok);border-color:var(--ok);color:#0b1a10}
+.bpm-sl{appearance:none;-webkit-appearance:none;width:100px;height:4px;border-radius:3px;
+  background:var(--s3);outline:none;cursor:pointer}
+.bpm-sl::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;
+  background:var(--q);cursor:pointer;box-shadow:0 0 0 3px rgba(112,192,255,.18)}
+.bpm-n{width:42px;background:var(--s2);border:1px solid var(--br2);border-radius:7px;
+  padding:4px 5px;color:var(--tx);font-family:'Space Mono',monospace;font-size:11px;text-align:center}
+#precount{position:fixed;inset:0;display:none;align-items:center;justify-content:center;
+  z-index:300;background:rgba(0,0,0,.65);backdrop-filter:blur(6px)}
+.pcn{font-size:96px;font-weight:800;font-family:'Space Mono',monospace;color:var(--q);
+  opacity:0;line-height:1;text-align:center}
+.pcsub{font-size:14px;color:var(--tx2);margin-top:6px;text-align:center}
+@keyframes pcpop{0%{opacity:0;transform:scale(1.7)}18%{opacity:1;transform:scale(1)}82%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.4)}}
+.pcn.run{animation:pcpop .44s ease forwards}
+.fbmsg{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(14px);
+  display:flex;align-items:center;gap:7px;background:var(--s2);border:1px solid var(--br);
+  border-radius:9px;padding:9px 15px;font-size:12px;font-family:'Noto Sans TC',sans-serif;
+  width:min(92%,360px);box-shadow:0 10px 26px rgba(0,0,0,.28);
+  opacity:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);pointer-events:none;z-index:220}
+.fbmsg.show{transform:translateX(-50%) translateY(0);opacity:1}
+.fbmsg.ok{border-color:rgba(91,211,168,.4);background:rgba(91,211,168,.07)}
 .fbmsg.hint{border-color:rgba(251,146,60,.35);background:rgba(251,146,60,.06)}
 .fbmsg.warn{border-color:rgba(248,113,113,.35);background:rgba(248,113,113,.06)}
-
-/* GLOW & CONFETTI */
-@keyframes glow{0%{box-shadow:0 0 0 0 rgba(163,230,53,0)}50%{box-shadow:0 0 20px 0 rgba(163,230,53,.28)}100%{box-shadow:0 0 0 0 rgba(163,230,53,0)}}
-.do-glow{animation:glow .55s ease 3}
-@keyframes fall{0%{transform:translateY(-60px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
-.cf{position:fixed;border-radius:2px;pointer-events:none;z-index:9998;animation:fall linear forwards}
-
-/* HIDDEN PANEL */
-.hpanel{display:block}
-@media(max-width:600px){
-  #main{max-width:100%;padding:10px 8px 80px}
-  .bpmw{gap:4px;font-size:10px}
-  .bpmw span{display:none}
-  .bpms{width:50px}
-  #bpminput{width:44px;margin-left:4px}
-  .btn{padding:6px 9px;font-size:10px}
-  label span{display:none}
-}
-@media(max-width:500px){
-  .pi{min-width:80px;padding:10px 12px}
-  .pi-ico{width:32px;height:32px}
-  .pi-name{font-size:8px}
-}
-@media(max-width:900px){
-  #main{padding-bottom:80px}
-}
+@keyframes fall{0%{transform:translateY(-40px) rotate(0);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+.cf{position:fixed;border-radius:2px;pointer-events:none;z-index:9999;animation:fall linear forwards}
 @media(max-width:700px){
-  #bottomBar{grid-template-columns:1fr;justify-items:center;padding:12px 12px 14px;}
-  .bb-left,.bb-center,.bb-right{width:100%;justify-content:center;}
-  .bb-left{gap:10px;}
-  .bb-center{min-width:auto;}
-  .bb-right{gap:8px;}
-  .bb-btn{font-size:10px;padding:8px 10px;}
-  .bb-btn.primary{width:44px;height:44px;font-size:16px;}
-  .bb-left .bpms{width:100%;max-width:240px;}
-  .bb-bpmnum{width:52px;}
-  .tool-popup{right:0;left:auto;bottom:calc(100% + 8px);min-width:160px;max-width:100%;}
+  #bar{grid-template-columns:1fr;justify-items:center;padding:9px 10px 13px}
+  .bar-l,.bar-c,.bar-r{width:100%;justify-content:center;flex-wrap:wrap}
+  .bpm-sl{width:120px}
+}
+@media(max-width:520px){
+  .beat-area{grid-template-columns:repeat(2,1fr)!important}
+  .cell{min-height:42px}.nota{min-height:54px}.nota svg{height:50px}
 }
 </style>
 </head>
 <body>
-<div id="precount"><div class="pcwrap"><div class="pcn" id="pcn">1</div><div class="pcsub">預備拍</div></div></div>
-
-
+<div id="precount"><div><div class="pcn" id="pcn">1</div><div class="pcsub">預備拍</div></div></div>
+<header id="hdr">
+  <div class="logo">節奏 <span>Rhythm</span></div>
+  <div class="hdr-sep"></div>
+  <span style="font-size:10px;color:var(--tx3);font-family:'Space Mono',monospace">拍號</span>
+  <button class="ts-btn on" onclick="APP.setTS('4/4',this)">4/4</button>
+  <button class="ts-btn" onclick="APP.setTS('3/4',this)">3/4</button>
+  <button class="ts-btn" onclick="APP.setTS('2/4',this)">2/4</button>
+  <button class="ts-btn" onclick="APP.setTS('6/8',this)">6/8</button>
+</header>
 <main id="main">
-
-<!-- QUESTION SECTION -->
-<div class="sec-card" id="qcard">
-  <div class="sec-title">題目節奏</div>
-  <div class="beat-area" id="qgrid"></div>
-  <div class="hpanel" id="tpal">
-    <div style="height:1px;background:var(--br);margin:10px 0"></div>
-    <div class="pw" id="tpal-pw">
-      <div class="pal-inline-row">
-        <div class="pal-tabs-inline">
-          <button class="pal-tab active t-note" id="tpal-tab-note" onclick="switchPalTab('t','note')" title="音符">
-            <svg width="18" height="22" viewBox="0 0 34 44" fill="none">
-              <ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="currentColor"/>
-              <line x1="23" y1="34" x2="23" y2="5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-            </svg>
-          </button>
-          <button class="pal-tab t-rest" id="tpal-tab-rest" onclick="switchPalTab('t','rest')" title="休止符">
-            <svg width="16" height="22" viewBox="0 0 24 38" fill="none">
-              <path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-        <div class="pal-slide-wrap" id="tpal-wrap" style="flex:1;min-width:0">
-          <div class="pal-slide" id="tpal-items"></div>
-        </div>
+  <div class="sec-card" id="qcard">
+    <div class="sec-lbl">題目節奏 <span class="sec-tag" id="qlbl">4/4</span></div>
+    <div class="beat-area" id="qgrid"></div>
+    <div class="pal-row">
+      <div class="pal-tabs" id="qtabs">
+        <button class="pal-tab on t-n" onclick="APP.palTab('q','n')" title="音符">
+          <svg width="15" height="19" viewBox="0 0 34 44" fill="none"><ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="currentColor"/><line x1="23" y1="34" x2="23" y2="5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        </button>
+        <button class="pal-tab t-r" onclick="APP.palTab('q','r')" title="休止符">
+          <svg width="13" height="19" viewBox="0 0 24 38" fill="none"><path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
+      <div class="pal-items" id="qpal"></div>
     </div>
   </div>
-</div>
-
-<!-- ANSWER SECTION -->
-<div class="sec-card" id="acard" style="display:none;">
-  <div class="sec-title">立即測驗</div>
-  <div class="beat-area" id="agrid"></div>
-  <div class="hpanel" id="spal">
-    <div style="height:1px;background:var(--br);margin:10px 0"></div>
-    <div class="pw">
-      <div class="pal-inline-row">
-        <div class="pal-tabs-inline">
-          <button class="pal-tab active t-note" id="spal-tab-note" onclick="switchPalTab('s','note')" title="音符">
-            <svg width="18" height="22" viewBox="0 0 34 44" fill="none">
-              <ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="currentColor"/>
-              <line x1="23" y1="34" x2="23" y2="5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-            </svg>
-          </button>
-          <button class="pal-tab t-rest" id="spal-tab-rest" onclick="switchPalTab('s','rest')" title="休止符">
-            <svg width="16" height="22" viewBox="0 0 24 38" fill="none">
-              <path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </button>
-        </div>
-        <div class="pal-slide-wrap" id="spal-wrap" style="flex:1;min-width:0">
-          <div class="pal-slide" id="spal-items"></div>
-        </div>
+  <div class="sec-card" id="acard" style="display:none">
+    <div class="sec-lbl">立即測驗 <span class="sec-tag" id="albl">4/4</span></div>
+    <div class="beat-area" id="agrid"></div>
+    <div class="pal-row">
+      <div class="pal-tabs" id="atabs">
+        <button class="pal-tab on t-n" onclick="APP.palTab('a','n')" title="音符">
+          <svg width="15" height="19" viewBox="0 0 34 44" fill="none"><ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="currentColor"/><line x1="23" y1="34" x2="23" y2="5" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+        </button>
+        <button class="pal-tab t-r" onclick="APP.palTab('a','r')" title="休止符">
+          <svg width="13" height="19" viewBox="0 0 24 38" fill="none"><path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
       </div>
+      <div class="pal-items" id="apal"></div>
     </div>
   </div>
-</div>
-
 </main>
-<div class="fbmsg info" id="fbmsg">
-  <span id="fbico">💡</span><span id="fbtxt">選擇音符後點擊格子放置；再次點擊已填格子可刪除</span>
-</div>
+<div class="fbmsg" id="fb"><span id="fbico">💡</span><span id="fbtxt"></span></div>
 <input type="checkbox" id="togPre" checked hidden>
-<div id="bottomBar">
-  <div class="bb-left">
-    <span class="bb-label">BPM</span>
-    <input type="range" id="bpms" min="40" max="200" value="76" class="bpms">
-    <input type="number" id="bpminput" min="40" max="200" value="76" class="bb-bpmnum">
+<div id="bar">
+  <div class="bar-l">
+    <span style="font-size:10px;color:var(--tx3);font-family:'Space Mono',monospace">BPM</span>
+    <input type="range" id="bsl" class="bpm-sl" min="30" max="200" value="72">
+    <input type="number" id="bnum" class="bpm-n" min="30" max="200" value="72">
   </div>
-  <div class="bb-center" id="bbCenter"></div>
-  <div class="bb-right" id="bbRight"></div>
+  <div class="bar-c">
+    <button class="bb tab-on" id="tab-q" onclick="APP.switchTab('q')">題目節奏</button>
+    <button class="bb" id="tab-a" onclick="APP.switchTab('a')">立即測驗</button>
+  </div>
+  <div class="bar-r" id="bar-r"></div>
 </div>
 <script>
-// ─── AUDIO (unified pitch = G4 392Hz for all notes) ───
-const AU={
-  ctx:null, bpm:60,
-  FREQ:392, // G4 — all notes same pitch
-  init(){try{this.ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}},
-  wake(){if(this.ctx?.state==='suspended')this.ctx.resume()},
-  get s16(){return(60/this.bpm)/4},
-  tone(t,dur,vol=.22){
-    if(!this.ctx)return;
-    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
-    o.connect(g);g.connect(this.ctx.destination);
-    o.type='triangle';o.frequency.value=this.FREQ;
+// ══════════════════════════════════════════════
+// AUDIO
+// ══════════════════════════════════════════════
+const AU=(()=>{
+  let ctx=null;
+  const init=()=>{try{ctx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}};
+  const wake=()=>ctx?.state==='suspended'&&ctx.resume();
+  const bpm=()=>parseInt(document.getElementById('bsl').value)||72;
+  const s16=()=>(60/bpm())/4;
+  function tone(t,dur,freq=392,vol=.22,type='triangle'){
+    if(!ctx)return;
+    const o=ctx.createOscillator(),g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.type=type;o.frequency.value=freq;
     g.gain.setValueAtTime(vol,t);
-    g.gain.setValueAtTime(vol,t+dur*.55);
-    g.gain.exponentialRampToValueAtTime(.001,t+dur*.9);
+    g.gain.exponentialRampToValueAtValue=undefined;
+    g.gain.linearRampToValueAtTime(.001,t+dur*.9);
     o.start(t);o.stop(t+dur);
-  },
-  restTick(t){
-    if(!this.ctx)return;
-    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
-    o.connect(g);g.connect(this.ctx.destination);
-    o.frequency.value=700;g.gain.setValueAtTime(.06,t);
-    g.gain.exponentialRampToValueAtTime(.001,t+.022);
-    o.start(t);o.stop(t+.025);
-  },
-  click(t,acc){
-    if(!this.ctx)return;
-    const o=this.ctx.createOscillator(),g=this.ctx.createGain();
-    o.connect(g);g.connect(this.ctx.destination);
-    o.frequency.value=acc?1400:950;
-    g.gain.setValueAtTime(acc?.28:.14,t);
-    g.gain.exponentialRampToValueAtTime(.001,t+.038);
-    o.start(t);o.stop(t+.045);
-  },
-  playNote(type,t){
-    if(type.includes('rest')){this.restTick(t);return;}
-    const dm={quarter:this.s16*3.2,eighth:this.s16*1.6,
-      'dotted-eighth':this.s16*2.4,sixteenth:this.s16*.75};
-    this.tone(t,dm[type]||this.s16);
-  },
-  ding(ok){
-    this.wake();if(!this.ctx)return;
-    const t=this.ctx.currentTime;
-    if(ok){[this.FREQ,this.FREQ*1.26,this.FREQ*1.5].forEach((f,i)=>{
-      const o=this.ctx.createOscillator(),g=this.ctx.createGain();
-      o.connect(g);g.connect(this.ctx.destination);
-      o.type='sine';o.frequency.value=f;
-      g.gain.setValueAtTime(.16,t+i*.07);g.gain.exponentialRampToValueAtTime(.001,t+i*.07+.38);
-      o.start(t+i*.07);o.stop(t+i*.07+.4);
-    });}else{
-      const o=this.ctx.createOscillator(),g=this.ctx.createGain();
-      o.connect(g);g.connect(this.ctx.destination);
-      o.type='sawtooth';o.frequency.value=155;
-      g.gain.setValueAtTime(.16,t);g.gain.exponentialRampToValueAtTime(.001,t+.26);
-      o.start(t);o.stop(t+.28);
-    }
-  },
-  precount(cb){
-    this.wake();if(!this.ctx)return;
-    this.bpm=parseInt(D('bpms').value)||76;
-    const bd=60/this.bpm,now=this.ctx.currentTime+.05;
-    for(let i=0;i<4;i++)this.click(now+i*bd,i===0);
-    const pd=D('precount'),pn=D('pcn');
-    pd.style.display='flex';
-    for(let i=0;i<4;i++){
-      setTimeout(()=>{
-        pn.textContent=i+1; // 1,2,3,4 count UP
-        pn.className='pcn';void pn.offsetWidth;pn.className='pcn run';
-      },(i*bd+.05)*1000);
-    }
-    setTimeout(()=>{pd.style.display='none';cb();},(4*bd+.05)*1000);
-  },
-  playPattern(notes,onStep,onDone){
-    this.wake();if(!this.ctx)return;
-    this.bpm=parseInt(D('bpms').value)||76;
-    let t=this.ctx.currentTime+.05,total=0;
-    notes.forEach(n=>{
-      const dur=n.duration*this.s16;
-      this.playNote(n.type,t);
-      const delay=(t-this.ctx.currentTime)*1000;
-      setTimeout(()=>onStep&&onStep(n.startCell,n.duration),delay);
-      t+=dur;total+=dur;
-    });
-    setTimeout(()=>onDone&&onDone(),total*1000+110);
   }
-};
+  const DUR16={half:8,quarter:4,eighth:2,sixteenth:1,'dotted-half':12,'dotted-quarter':6,'dotted-eighth':3};
+  return{
+    init,wake,bpm,s16,ctx:null,
+    get ctx(){return ctx;},
+    playNote(type,t){
+      if(!ctx)return;
+      if(type.includes('rest')){tone(t,.02,700,.05,'sine');return;}
+      tone(t,(DUR16[type]||4)*s16());
+    },
+    click(t,acc){tone(t,.04,acc?1400:950,acc?.26:.13,'sine');},
+    ding(ok){
+      wake();if(!ctx)return;
+      const t=ctx.currentTime;
+      if(ok)[392,494,587].forEach((f,i)=>tone(t+i*.07,.36,f,.14,'sine'));
+      else tone(t,.26,155,.14,'sawtooth');
+    },
+    precount(beats,cb){
+      wake();if(!ctx){cb();return;}
+      const bd=60/bpm(),now=ctx.currentTime+.05;
+      const pd=document.getElementById('precount'),pn=document.getElementById('pcn');
+      pd.style.display='flex';
+      for(let i=0;i<beats;i++){
+        this.click(now+i*bd,i===0);
+        setTimeout(()=>{pn.textContent=i+1;pn.className='pcn';void pn.offsetWidth;pn.className='pcn run';},i*bd*1000);
+      }
+      setTimeout(()=>{pd.style.display='none';cb();},(beats*bd+.05)*1000);
+    },
+    // playPattern with optional metro clicks on each beat
+    playPattern(notes,onStep,onDone,metro=false,spb=4){
+      wake();if(!ctx)return;
+      let t=ctx.currentTime+.05,total=0;
+      if(metro){
+        // schedule click on each beat boundary
+        const beatDur=spb*s16();
+        const totalBeats=Math.ceil(notes.reduce((s,n)=>s+n.duration,0)/spb);
+        for(let i=0;i<totalBeats;i++) this.click(t+i*beatDur,i===0);
+      }
+      notes.forEach(n=>{
+        const dur=n.duration*s16();
+        this.playNote(n.type,t);
+        const delay=(t-ctx.currentTime)*1000;
+        setTimeout(()=>onStep&&onStep(n.startCell,n.duration),delay);
+        t+=dur;total+=dur;
+      });
+      setTimeout(()=>onDone&&onDone(),total*1000+130);
+    }
+  };
+})();
 
-// ─── NOTE DEFINITIONS ───
+// ══════════════════════════════════════════════
+// NOTE DEFINITIONS
+// ══════════════════════════════════════════════
 const ND={
-  'quarter':             {name:'四分音符',     short:'四',   cells:4,col:'var(--q)', bg:'var(--qa)',cls:'nq', pv:'pv-q',isRest:false},
-  'eighth':              {name:'八分音符',     short:'八',   cells:2,col:'var(--e)', bg:'var(--ea)',cls:'ne', pv:'pv-e',isRest:false},
-  'dotted-eighth':       {name:'附點八分音符', short:'附八', cells:3,col:'var(--de)',bg:'var(--dea)',cls:'nd',pv:'pv-d',isRest:false},
-  'sixteenth':           {name:'十六分音符',   short:'十六', cells:1,col:'var(--sv)',bg:'var(--sva)',cls:'nv',pv:'pv-s',isRest:false},
-  'quarter-rest':        {name:'四分休止符',   short:'四休', cells:4,col:'var(--r)', bg:'var(--ra)',cls:'nrq',pv:'pv-r',isRest:true},
-  'eighth-rest':         {name:'八分休止符',   short:'八休', cells:2,col:'var(--r)', bg:'var(--ra)',cls:'nre',pv:'pv-r',isRest:true},
-  'dotted-eighth-rest':  {name:'附點八分休止符',short:'附休',cells:3,col:'var(--r)', bg:'var(--ra)',cls:'nrd',pv:'pv-r',isRest:true},
-  'sixteenth-rest':      {name:'十六分休止符', short:'十休', cells:1,col:'var(--r)', bg:'var(--ra)',cls:'nrv',pv:'pv-r',isRest:true},
+  'half':               {name:'二分音符',   cells:8, c:'h',cls:'nh',rest:false},
+  'quarter':            {name:'四分音符',   cells:4, c:'q',cls:'nq',rest:false},
+  'eighth':             {name:'八分音符',   cells:2, c:'e',cls:'ne',rest:false},
+  'sixteenth':          {name:'十六分音符', cells:1, c:'s',cls:'nv',rest:false},
+  'dotted-half':        {name:'附點二分',   cells:12,c:'h',cls:'nd',rest:false},
+  'dotted-quarter':     {name:'附點四分',   cells:6, c:'q',cls:'nd',rest:false},
+  'dotted-eighth':      {name:'附點八分',   cells:3, c:'d',cls:'nd',rest:false},
+  'half-rest':          {name:'二分休止',   cells:8, c:'r',cls:'nr',rest:true},
+  'quarter-rest':       {name:'四分休止',   cells:4, c:'r',cls:'nr',rest:true},
+  'eighth-rest':        {name:'八分休止',   cells:2, c:'r',cls:'nr',rest:true},
+  'sixteenth-rest':     {name:'十六分休止', cells:1, c:'r',cls:'nr',rest:true},
+  'dotted-half-rest':   {name:'附點二分休', cells:12,c:'r',cls:'nr',rest:true},
+  'dotted-quarter-rest':{name:'附點四分休', cells:6, c:'r',cls:'nr',rest:true},
+  'dotted-eighth-rest': {name:'附點八分休', cells:3, c:'r',cls:'nr',rest:true},
 };
+const COL={h:'var(--h)',q:'var(--q)',e:'var(--e)',s:'var(--sv)',d:'var(--de)',r:'var(--r)',mk:'var(--mk)'};
+const DOTMAP={half:'dotted-half',quarter:'dotted-quarter',eighth:'dotted-eighth',
+  'half-rest':'dotted-half-rest','quarter-rest':'dotted-quarter-rest','eighth-rest':'dotted-eighth-rest'};
+const UNDOTMAP=Object.fromEntries(Object.entries(DOTMAP).map(([k,v])=>[v,k]));
+const TS={'4/4':{beats:4,spb:4,total:16},'3/4':{beats:3,spb:4,total:12},'2/4':{beats:2,spb:4,total:8},'6/8':{beats:6,spb:2,total:12}};
 
-// ─── PALETTE ICONS (SVG functions) ───
-const COL={q:'var(--q)',e:'var(--e)',d:'var(--de)',sv:'var(--sv)',r:'var(--r)'};
-const PICO={
-  'quarter':c=>`<svg viewBox="0 0 34 44" fill="none"><ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="${c}"/><line x1="23" y1="34" x2="23" y2="5" stroke="${c}" stroke-width="3" stroke-linecap="round"/></svg>`,
-  'eighth':c=>`<svg viewBox="0 0 34 44" fill="none"><ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="${c}"/><line x1="23" y1="34" x2="23" y2="5" stroke="${c}" stroke-width="3" stroke-linecap="round"/><path d="M23 5 Q34 13 23 24" stroke="${c}" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
-  'dotted-eighth':c=>`<svg viewBox="0 0 42 44" fill="none"><ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="${c}"/><circle cx="28" cy="36" r="3.5" fill="${c}"/><line x1="23" y1="34" x2="23" y2="5" stroke="${c}" stroke-width="3" stroke-linecap="round"/><path d="M23 5 Q34 13 23 24" stroke="${c}" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
-  'sixteenth':c=>`<svg viewBox="0 0 34 44" fill="none"><ellipse cx="13" cy="37" rx="10" ry="7" transform="rotate(-15 13 37)" fill="${c}"/><line x1="23" y1="34" x2="23" y2="5" stroke="${c}" stroke-width="3" stroke-linecap="round"/><path d="M23 5 Q34 13 23 23" stroke="${c}" stroke-width="2.5" fill="none" stroke-linecap="round"/><path d="M23 14 Q34 22 23 32" stroke="${c}" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
-  'quarter-rest':c=>`<svg viewBox="0 0 24 38" fill="none"><path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="${c}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-  'eighth-rest':c=>`<svg viewBox="0 0 24 30" fill="none"><circle cx="17" cy="8" r="5" fill="${c}"/><path d="M17 13 L5 26" stroke="${c}" stroke-width="3" stroke-linecap="round"/></svg>`,
-  'dotted-eighth-rest':c=>`<svg viewBox="0 0 32 30" fill="none"><circle cx="17" cy="8" r="5" fill="${c}"/><path d="M17 13 L5 26" stroke="${c}" stroke-width="3" stroke-linecap="round"/><circle cx="26" cy="16" r="3" fill="${c}"/></svg>`,
-  'sixteenth-rest':c=>`<svg viewBox="0 0 24 34" fill="none"><circle cx="17" cy="6" r="4" fill="${c}"/><path d="M17 10 L5 22" stroke="${c}" stroke-width="3" stroke-linecap="round"/><circle cx="12" cy="19" r="4" fill="${c}"/><path d="M12 23 L3 32" stroke="${c}" stroke-width="2.5" stroke-linecap="round"/></svg>`,
+// ══════════════════════════════════════════════
+// SVG ICONS
+// ══════════════════════════════════════════════
+const BASE_IC={
+  'half':         c=>`<svg viewBox="0 0 32 52" fill="none"><ellipse cx="11" cy="44" rx="9" ry="6" transform="rotate(-15 11 44)" stroke="${c}" stroke-width="2.5" fill="none"/><line x1="20" y1="41" x2="20" y2="5" stroke="${c}" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+  'quarter':      c=>`<svg viewBox="0 0 32 48" fill="none"><ellipse cx="11" cy="40" rx="9" ry="6" transform="rotate(-15 11 40)" fill="${c}"/><line x1="20" y1="37" x2="20" y2="5" stroke="${c}" stroke-width="2.6" stroke-linecap="round"/></svg>`,
+  'eighth':       c=>`<svg viewBox="0 0 32 48" fill="none"><ellipse cx="11" cy="40" rx="9" ry="6" transform="rotate(-15 11 40)" fill="${c}"/><line x1="20" y1="37" x2="20" y2="5" stroke="${c}" stroke-width="2.6" stroke-linecap="round"/><path d="M20 5 Q32 13 20 25" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`,
+  'sixteenth':    c=>`<svg viewBox="0 0 32 48" fill="none"><ellipse cx="11" cy="40" rx="9" ry="6" transform="rotate(-15 11 40)" fill="${c}"/><line x1="20" y1="37" x2="20" y2="5" stroke="${c}" stroke-width="2.6" stroke-linecap="round"/><path d="M20 5 Q32 13 20 24" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round"/><path d="M20 16 Q32 24 20 34" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round"/></svg>`,
+  'quarter-rest': c=>`<svg viewBox="0 0 24 38" fill="none"><path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="${c}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
+  'eighth-rest':  c=>`<svg viewBox="0 0 24 30" fill="none"><circle cx="16" cy="8" r="5" fill="${c}"/><path d="M16 13 L4 26" stroke="${c}" stroke-width="3" stroke-linecap="round"/></svg>`,
+  'sixteenth-rest':c=>`<svg viewBox="0 0 24 34" fill="none"><circle cx="16" cy="6" r="4" fill="${c}"/><path d="M16 10 L4 22" stroke="${c}" stroke-width="2.8" stroke-linecap="round"/><circle cx="11" cy="19" r="4" fill="${c}"/><path d="M11 23 L3 32" stroke="${c}" stroke-width="2.4" stroke-linecap="round"/></svg>`,
+  'half-rest':    c=>`<svg viewBox="0 0 24 28" fill="none"><rect x="4" y="7" width="16" height="7" rx="1" fill="${c}"/><line x1="3" y1="14" x2="21" y2="14" stroke="${c}" stroke-width="1.4"/></svg>`,
 };
-// Small cell icons (same viewBox, CSS sizes them)
-const CICO=PICO;
+// dotted cell icons — base icon + inline dot (no overlay needed in cell)
+const DOT_CELL_IC={
+  'dotted-half':     c=>`<svg viewBox="0 0 42 52" fill="none"><ellipse cx="11" cy="44" rx="9" ry="6" transform="rotate(-15 11 44)" stroke="${c}" stroke-width="2.5" fill="none"/><line x1="20" y1="41" x2="20" y2="5" stroke="${c}" stroke-width="2.6" stroke-linecap="round"/><circle cx="34" cy="43" r="4" fill="${c}"/></svg>`,
+  'dotted-quarter':  c=>`<svg viewBox="0 0 42 48" fill="none"><ellipse cx="11" cy="40" rx="9" ry="6" transform="rotate(-15 11 40)" fill="${c}"/><line x1="20" y1="37" x2="20" y2="5" stroke="${c}" stroke-width="2.6" stroke-linecap="round"/><circle cx="34" cy="39" r="4" fill="${c}"/></svg>`,
+  'dotted-eighth':   c=>`<svg viewBox="0 0 42 48" fill="none"><ellipse cx="11" cy="40" rx="9" ry="6" transform="rotate(-15 11 40)" fill="${c}"/><line x1="20" y1="37" x2="20" y2="5" stroke="${c}" stroke-width="2.6" stroke-linecap="round"/><path d="M20 5 Q32 13 20 25" stroke="${c}" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="34" cy="39" r="4" fill="${c}"/></svg>`,
+  'dotted-half-rest':   c=>`<svg viewBox="0 0 34 28" fill="none"><rect x="4" y="7" width="16" height="7" rx="1" fill="${c}"/><line x1="3" y1="14" x2="21" y2="14" stroke="${c}" stroke-width="1.4"/><circle cx="28" cy="9" r="3.5" fill="${c}"/></svg>`,
+  'dotted-quarter-rest':c=>`<svg viewBox="0 0 34 38" fill="none"><path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="${c}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="28" cy="15" r="3.5" fill="${c}"/></svg>`,
+  'dotted-eighth-rest': c=>`<svg viewBox="0 0 34 30" fill="none"><circle cx="16" cy="8" r="5" fill="${c}"/><path d="M16 13 L4 26" stroke="${c}" stroke-width="3" stroke-linecap="round"/><circle cx="28" cy="15" r="3.5" fill="${c}"/></svg>`,
+};
+const DOT_SVG=c=>`<svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" fill="${c}"/></svg>`;
 
-// ─── NOTATION RENDERER ───
-const f=n=>Number(n).toFixed(1);
-
-function beatToNotes(gs,beat){
-  const notes=[],start=beat*4,end=start+4;
-  let i=start;
-  while(i<end){
-    const cell=gs.cells[i];
-    if(cell.type&&cell.isStart){
-      const d=ND[cell.type];
-      let cnt=0;
-      for(let j=i;j<end&&gs.cells[j].type===cell.type&&(j===i||!gs.cells[j].isStart);j++)cnt++;
-      notes.push({type:cell.type,cells:d.cells,cellsHere:cnt,offset:i-start,isRest:d.isRest});
-      i+=cnt;
-    }else if(cell.type&&!cell.isStart){i++;}
-    else{i++;}
-  }
-  return notes;
+function cellIcon(type,colVar){
+  if(DOT_CELL_IC[type]) return DOT_CELL_IC[type](colVar);
+  const base=UNDOTMAP[type]||type;
+  return BASE_IC[base]?BASE_IC[base](colVar):'';
+}
+function palIcoHtml(type,colVar){
+  // base icon always present; dot-ol always in DOM, shown by .pi.dotted via CSS
+  const base=UNDOTMAP[type]||type;
+  const baseSvg=BASE_IC[base]?BASE_IC[base](colVar):'';
+  return baseSvg+`<span class="dot-ol">${DOT_SVG(colVar)}</span>`;
 }
 
-function renderNotaSVG(notes){
-  const hasAny=notes.some(n=>n.type);
-  if(!hasAny)return null;
-  const W=90,H=65;
-  const SY=50,ST=16; // staff Y, stem top Y
-  const BH=4,BG=5;  // beam height, beam gap
-  const NW=5.5,NH=3.8; // notehead radii
-  const CW=(W-10)/4; // cell width
+// ══════════════════════════════════════════════
+// NOTATION SVG per beat
+// beatSVG correctly handles notes that START in this beat
+// (span capped at beat boundary for display only)
+// ══════════════════════════════════════════════
+function beatSVG(gs,beatIdx,cfg){
+  const W=86,H=58,SY=44,ST=12,BH=4;
+  const {spb}=cfg;
+  const start=beatIdx*spb,end=start+spb;
+  const CW=(W-6)/spb;
+  const NRX=4.5,NRY=3;
+  const notes=[];
 
-  const pos=notes.filter(n=>n.type).map(n=>{
-    const x=5+n.offset*CW;
-    const nx=x+n.cellsHere*CW*0.45; // notehead center X
-    const sx=nx+NW+0.8; // stem X
-    return{...n,nx,sx};
-  });
-  const pitch=pos.filter(n=>!n.isRest);
-  const rests=pos.filter(n=>n.isRest);
-  // beamable: eighth (cells<=2) OR dotted-eighth (cells=3, type includes dotted)
-  const beam=pitch.filter(n=>n.cells<=2||n.type.includes('dotted'));
-  const beamGroups=[];
-  let group=[];
-  beam.forEach(n=>{
-    if(!group.length){
-      group=[n];
-    } else {
-      const prev=group[group.length-1];
-      if(n.offset===prev.offset+prev.cells){
-        group.push(n);
-      } else {
-        beamGroups.push(group);
-        group=[n];
-      }
-    }
-  });
-  if(group.length)beamGroups.push(group);
-  const hasBeam=beamGroups.some(g=>g.length>=2);
-  const beamGroupByNote=new Map();
-  beamGroups.forEach(g=>g.forEach(n=>beamGroupByNote.set(n,g)));
+  // collect notes whose START cell is in this beat
+  for(let i=start;i<end;){
+    const c=gs.cells[i];
+    if(c.type&&c.isStart){
+      // real duration of note (may extend beyond beat boundary)
+      const realCells=ND[c.type].cells;
+      // visual span within this beat only
+      const visSpan=Math.min(realCells,end-i);
+      notes.push({type:c.type,offset:i-start,visSpan,realCells,rest:ND[c.type].rest});
+      i+=visSpan;
+    } else i++;
+  }
 
-  let s=`<svg viewBox="0 0 ${W} ${H}" fill="none" xmlns="http://www.w3.org/2000/svg">`;
-  // staff line
-  s+=`<line x1="2" y1="${SY}" x2="${W-2}" y2="${SY}" stroke="currentColor" stroke-width="1" opacity=".35"/>`;
+  const pos=notes.map(n=>{
+    // center notehead based on real note duration scaled to CW
+    // but clamp display width to visSpan
+    const nx=3+n.offset*CW+n.visSpan*CW*.44;
+    return{...n,nx,sx:nx+NRX+1};
+  });
+
+  let s=`<svg viewBox="0 0 ${W} ${H}" fill="none">`;
+  s+=`<line x1="2" y1="${SY}" x2="${W-2}" y2="${SY}" stroke="currentColor" stroke-width=".9" opacity=".25"/>`;
+
+  const pitch=pos.filter(n=>!n.rest);
+  const rests=pos.filter(n=>n.rest);
+
+  // beam detection: adjacent eighth/sixteenth within the beat
+  // only beam notes with realCells<=2 that are consecutive (by offset)
+  const beamable=pitch.filter(n=>n.realCells<=2);
+  const inBeam=new Set();
+  for(let i=0;i<beamable.length-1;i++){
+    const a=beamable[i],b=beamable[i+1];
+    // consecutive by offset within beat
+    if(a.offset+a.visSpan===b.offset){inBeam.add(a);inBeam.add(b);}
+  }
 
   // noteheads + stems
   pitch.forEach(n=>{
-    const cx=n.nx;
-    s+=`<ellipse cx="${f(cx)}" cy="${f(SY)}" rx="${NW}" ry="${NH}" transform="rotate(-12 ${f(cx)} ${f(SY)})" fill="currentColor"/>`;
-    if(n.type.includes('dotted')){
-      s+=`<circle cx="${f(cx+NW+3.5)}" cy="${f(SY-2)}" r="2" fill="currentColor"/>`;
-    }
-    // stem for all pitch notes
-    s+=`<line x1="${f(n.sx)}" y1="${f(SY-NH+0.5)}" x2="${f(n.sx)}" y2="${f(ST)}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>`;
-    // isolated flags (when not in beam group)
-    const ng=beamGroupByNote.get(n);
-    if(ng?.length===1){
-      s+=`<path d="M${f(n.sx)} ${f(ST)} Q${f(n.sx+11)} ${f(ST+7)} ${f(n.sx)} ${f(ST+17)}" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-      if(n.cells===1){ // 16th: double flag
-        s+=`<path d="M${f(n.sx)} ${f(ST+10)} Q${f(n.sx+11)} ${f(ST+17)} ${f(n.sx)} ${f(ST+27)}" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>`;
-      }
+    const{nx,sx,type,realCells}=n;
+    const dot=type.startsWith('dotted-');
+    const open=type==='half'||type==='dotted-half';
+    if(open) s+=`<ellipse cx="${f(nx)}" cy="${SY}" rx="${NRX}" ry="${NRY}" transform="rotate(-12 ${f(nx)} ${SY})" stroke="currentColor" stroke-width="1.7" fill="none"/>`;
+    else     s+=`<ellipse cx="${f(nx)}" cy="${SY}" rx="${NRX}" ry="${NRY}" transform="rotate(-12 ${f(nx)} ${SY})" fill="currentColor"/>`;
+    if(dot)  s+=`<circle cx="${f(nx+NRX+4)}" cy="${f(SY-2.5)}" r="2.3" fill="currentColor"/>`;
+    s+=`<line x1="${f(sx)}" y1="${f(SY-NRY+.5)}" x2="${f(sx)}" y2="${ST}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`;
+    // flags for notes not in beam group
+    if(!inBeam.has(n)){
+      if(realCells<=2) s+=`<path d="M${f(sx)} ${ST} Q${f(sx+11)} ${ST+7} ${f(sx)} ${ST+18}" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/>`;
+      if(realCells===1) s+=`<path d="M${f(sx)} ${ST+10} Q${f(sx+11)} ${ST+17} ${f(sx)} ${ST+27}" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/>`;
     }
   });
 
-  // rest symbols
-  rests.forEach(n=>{
-    const cx=n.nx;
-    if(n.type==='quarter-rest'){
-      s+=`<path d="M${f(cx-4)} ${f(SY-13)} L${f(cx+5)} ${f(SY-7)} L${f(cx-3)} ${f(SY-2)} L${f(cx+5)} ${f(SY+5)} L${f(cx)} ${f(SY+12)}" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`;
-    }else if(n.type==='eighth-rest'||n.type==='dotted-eighth-rest'){
-      s+=`<circle cx="${f(cx+2)}" cy="${f(SY-9)}" r="2.8" fill="currentColor"/>`;
-      s+=`<line x1="${f(cx+2)}" y1="${f(SY-6.5)}" x2="${f(cx-3.5)}" y2="${f(SY+5)}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>`;
-      if(n.type==='dotted-eighth-rest')s+=`<circle cx="${f(cx+8)}" cy="${f(SY)}" r="1.8" fill="currentColor"/>`;
-    }else if(n.type==='sixteenth-rest'){
-      s+=`<circle cx="${f(cx+2)}" cy="${f(SY-11)}" r="2.5" fill="currentColor"/>`;
-      s+=`<line x1="${f(cx+2)}" y1="${f(SY-8.5)}" x2="${f(cx-2)}" y2="${f(SY)}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>`;
-      s+=`<circle cx="${f(cx-1)}" cy="${f(SY+2)}" r="2.5" fill="currentColor"/>`;
-      s+=`<line x1="${f(cx-1)}" y1="${f(SY+4.5)}" x2="${f(cx-5)}" y2="${f(SY+12)}" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>`;
+  // rests
+  rests.forEach(({type,nx})=>{
+    const dot=type.startsWith('dotted-');
+    const base=type.replace('dotted-','').replace('-rest','');
+    if(base==='quarter') s+=`<path d="M${f(nx-4)} ${SY-13} L${f(nx+5)} ${SY-7} L${f(nx-3)} ${SY-2} L${f(nx+5)} ${SY+5} L${f(nx)} ${SY+12}" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>`;
+    else if(base==='eighth'){
+      s+=`<circle cx="${f(nx+2)}" cy="${SY-9}" r="2.7" fill="currentColor"/>`;
+      s+=`<line x1="${f(nx+2)}" y1="${SY-6.5}" x2="${f(nx-3.5)}" y2="${SY+5}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`;
+    } else if(base==='sixteenth'){
+      s+=`<circle cx="${f(nx+2)}" cy="${SY-11}" r="2.4" fill="currentColor"/>`;
+      s+=`<line x1="${f(nx+2)}" y1="${SY-8.5}" x2="${f(nx-2)}" y2="${SY}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`;
+      s+=`<circle cx="${f(nx-1)}" cy="${SY+2}" r="2.4" fill="currentColor"/>`;
+      s+=`<line x1="${f(nx-1)}" y1="${SY+4.5}" x2="${f(nx-5)}" y2="${SY+12}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`;
+    } else if(base==='half'){
+      s+=`<rect x="${f(nx-6)}" y="${SY-13}" width="12" height="5.5" rx="1" fill="currentColor"/>`;
+      s+=`<line x1="${f(nx-8)}" y1="${SY-7}" x2="${f(nx+8)}" y2="${SY-7}" stroke="currentColor" stroke-width="1.3"/>`;
     }
+    if(dot) s+=`<circle cx="${f(nx+9)}" cy="${SY-5}" r="2.3" fill="currentColor"/>`;
   });
 
-  // primary beam for adjacent beam groups only
-  beamGroups.forEach(group=>{
-    if(group.length<2)return;
-    const bx1=group[0].sx, bx2=group[group.length-1].sx;
-    s+=`<rect x="${f(bx1)}" y="${f(ST-0.5)}" width="${f(bx2-bx1)}" height="${BH}" rx="1.5" fill="currentColor"/>`;
-    // secondary beam for consecutive 16th note runs inside this group
-    if(group.some(n=>n.cells===1)){
-      let rs=null,ri=-1;
-      group.forEach((n,gi)=>{
-        const is16=n.cells===1;
-        const next16=gi<group.length-1&&group[gi+1].cells===1&&n.offset+n.cellsHere===group[gi+1].offset;
-        if(is16){
-          if(rs===null){rs=n.sx;ri=gi;}
-          if(!next16){
-            const by=ST-0.5+BH+BG;
-            if(rs===n.sx){// single 16th stub
-              const sl=ri>0;
-              s+=`<rect x="${f(sl?n.sx-11:n.sx)}" y="${f(by)}" width="11" height="${BH}" rx="1.5" fill="currentColor"/>`;
-            }else{
-              s+=`<rect x="${f(rs)}" y="${f(by)}" width="${f(n.sx-rs)}" height="${BH}" rx="1.5" fill="currentColor"/>`;
-            }
-            rs=null;
-          }
-        }
-      });
+  // beams between adjacent pairs
+  for(let i=0;i<beamable.length-1;i++){
+    const a=beamable[i],b=beamable[i+1];
+    if(a.offset+a.visSpan===b.offset){
+      s+=`<rect x="${f(a.sx)}" y="${f(ST-.5)}" width="${f(b.sx-a.sx)}" height="${BH}" rx="1.5" fill="currentColor"/>`;
+      if(a.realCells===1&&b.realCells===1)
+        s+=`<rect x="${f(a.sx)}" y="${f(ST+BH+4)}" width="${f(b.sx-a.sx)}" height="${BH}" rx="1.5" fill="currentColor"/>`;
     }
-  });
-
-  s+=`</svg>`;
-  return s;
+  }
+  return s+'</svg>';
 }
+const f=n=>n.toFixed(1);
 
-// ─── GRID STATE ───
-function mkCells(){return Array(16).fill(null).map(()=>({type:null,nid:null,isStart:false}))}
-function mkGS(){
+// ══════════════════════════════════════════════
+// GRID STATE
+// ══════════════════════════════════════════════
+function mkGrid(total=16){
+  let cells=Array(total).fill(null).map(()=>({type:null,nid:null,isStart:false}));
+  let notes=[];
   return{
-    cells:mkCells(),notes:[],
-    reset(){this.cells=mkCells();this.notes=[]},
+    get cells(){return cells;},
+    get notes(){return notes;},
+    resize(n){cells=Array(n).fill(null).map(()=>({type:null,nid:null,isStart:false}));notes=[];},
+    reset(){cells.forEach(c=>{c.type=null;c.nid=null;c.isStart=false;});notes.length=0;},
     canPlace(sc,type){
-      const d=ND[type];if(!d||sc<0||sc+d.cells>16)return false;
-      if(!ST8.crossBeat){const bEnd=(Math.floor(sc/4)+1)*4;if(sc+d.cells>bEnd)return false;}
-      for(let i=sc;i<sc+d.cells;i++)if(this.cells[i].type)return false;
+      const d=ND[type];if(!d||sc<0||sc+d.cells>cells.length)return false;
+      for(let i=sc;i<sc+d.cells;i++)if(cells[i].type)return false;
       return true;
     },
     place(sc,type,force=false){
       if(!force&&!this.canPlace(sc,type))return null;
       const d=ND[type];
-      const nid='n'+Date.now()+Math.random().toString(36).slice(2,5);
-      this.notes.push({id:nid,type,startCell:sc,duration:d.cells});
-      for(let i=sc;i<sc+d.cells;i++)this.cells[i]={type,nid,isStart:i===sc};
+      const nid='n'+Date.now().toString(36)+Math.random().toString(36).slice(2,4);
+      notes.push({id:nid,type,startCell:sc,duration:d.cells});
+      for(let i=sc;i<sc+d.cells;i++)cells[i]={type,nid,isStart:i===sc};
       return nid;
     },
     remove(nid){
-      const n=this.notes.find(x=>x.id===nid);if(!n)return;
-      for(let i=n.startCell;i<n.startCell+n.duration;i++)this.cells[i]={type:null,nid:null,isStart:false};
-      this.notes=this.notes.filter(x=>x.id!==nid);
+      const n=notes.find(x=>x.id===nid);if(!n)return;
+      for(let i=n.startCell;i<n.startCell+n.duration;i++)cells[i]={type:null,nid:null,isStart:false};
+      notes.splice(notes.indexOf(n),1);
     },
-    removeAt(ci){if(this.cells[ci].nid)this.remove(this.cells[ci].nid);},
-    isFull(){return this.cells.every(c=>c.type)},
-    beatFull(b){for(let i=b*4;i<b*4+4;i++)if(!this.cells[i].type)return false;return true;},
-    pattern(){return[...this.notes].sort((a,b)=>a.startCell-b.startCell)}
+    removeAt(ci){const nid=cells[ci].nid;if(nid)this.remove(nid);},
+    hasAny(){return cells.some(c=>c.type);},
+    beatFull(b,spb){for(let i=b*spb;i<b*spb+spb;i++)if(!cells[i]?.type)return false;return true;},
+    pattern(){return[...notes].sort((a,b)=>a.startCell-b.startCell);},
+    noteStart(ci){
+      const nid=cells[ci]?.nid;if(!nid)return ci;
+      let i=ci;while(i>0&&cells[i].nid===nid&&!cells[i].isStart)i--;
+      return i;
+    }
   };
 }
-const QS=mkGS(),AS=mkGS();
+const GS={q:mkGrid(),a:mkGrid()};
 
-// ─── APP STATE ───
-const ST8={
-  crossBeat:false,teacherMode:false,metroSound:false,
-  selectedType:null,editTarget:'A',
-  markers:Array(16).fill(false)
-};
-
-const D=id=>document.getElementById(id);
-const el=(t,c,h)=>{const e=document.createElement(t);if(c)e.className=c;if(h!=null)e.innerHTML=h;return e};
-
-// ─── RENDER BEAT GROUPS ───
-function renderBeats(gs,containerId,pfx,isQ,showDots){
-  const con=D(containerId);con.innerHTML='';
-  for(let beat=0;beat<4;beat++){
-    const bg=el('div','bgrp');bg.id=`${pfx}bg${beat}`;
-    // label
-    const lbl=el('div','bgrp-label');lbl.textContent=`第 ${beat+1} 拍`;bg.appendChild(lbl);
-    // cells
-    const row=el('div','bgrp-cells');
-    for(let s=0;s<4;s++){const ci=beat*4+s;row.appendChild(buildCell(ci,pfx,gs,isQ));}
+// ══════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════
+function renderGrid(key,showDots,cfg){
+  const gs=GS[key],con=document.getElementById(key+'grid');
+  con.innerHTML='';
+  con.style.gridTemplateColumns=`repeat(${cfg.beats},1fr)`;
+  for(let beat=0;beat<cfg.beats;beat++){
+    const bg=document.createElement('div');
+    bg.className='bgrp';bg.id=`${key}bg${beat}`;
+    if(gs.beatFull(beat,cfg.spb))bg.classList.add('full');
+    const lbl=document.createElement('div');
+    lbl.className='bgrp-lbl';lbl.textContent=`第 ${beat+1} 拍`;bg.appendChild(lbl);
+    const row=document.createElement('div');row.className='bgrp-cells';
+    for(let s=0;s<cfg.spb;s++)row.appendChild(buildCell(key,beat*cfg.spb+s));
     bg.appendChild(row);
-    // notation display
-    const notaDiv=el('div','nota');notaDiv.id=`${pfx}nota${beat}`;
-    const bNotes=beatToNotes(gs,beat);
-    const svg=renderNotaSVG(bNotes);
-    if(svg){
-      notaDiv.innerHTML=svg;
-    }else{
-      notaDiv.innerHTML=`<svg viewBox="0 0 90 65" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <line x1="4" y1="50" x2="86" y2="50" stroke="currentColor" stroke-width="1" opacity=".2"/>
-      </svg>`;
-    }
-    bg.appendChild(notaDiv);
-    // marker dots (answer only)
+    const nota=document.createElement('div');nota.className='nota';
+    nota.innerHTML=beatSVG(gs,beat,cfg);bg.appendChild(nota);
     if(showDots){
-      const dr=el('div','bgrp-dots');
-      for(let s=0;s<4;s++){
-        const ci=beat*4+s;
-        const dot=el('div','mdk');dot.id=`mk${ci}`;
-        if(ST8.markers[ci])dot.classList.add('on');
-        if(!isQ){
-          dot.addEventListener('click',()=>toggleMark(ci));
-        }
+      const dr=document.createElement('div');dr.className='bgrp-dots';
+      for(let s=0;s<cfg.spb;s++){
+        const ci=beat*cfg.spb+s,dot=document.createElement('div');
+        dot.className='mdk'+(APP.markers[ci]?' on':'');dot.id=`mk${ci}`;
+        dot.onclick=()=>{APP.markers[ci]=!APP.markers[ci];dot.classList.toggle('on',APP.markers[ci]);};
         dr.appendChild(dot);
       }
       bg.appendChild(dr);
     }
-    if(gs.beatFull(beat))bg.classList.add('beat-full');
     con.appendChild(bg);
   }
 }
 
-function buildCell(ci,pfx,gs,isQ){
-  const cs=gs.cells[ci];
-  const c=el('div','cell');c.id=`${pfx}${ci}`;c.dataset.i=ci;
+function buildCell(key,ci){
+  const gs=GS[key],cs=gs.cells[ci];
+  const c=document.createElement('div');c.className='cell';c.id=`${key}${ci}`;
   if(cs.type){
     const d=ND[cs.type];c.classList.add(d.cls,'filled');
     if(cs.isStart){
-      const inn=el('div','cinner');
-      const ico=el('div','cico');ico.innerHTML=CICO[cs.type](d.col);inn.appendChild(ico);
-      c.appendChild(inn);
+      const inn=document.createElement('div');inn.className='cinner';
+      const ico=document.createElement('div');ico.className='cico';
+      // Use combined icon (base+dot for dotted types)
+      ico.innerHTML=cellIcon(cs.type,COL[d.c]);
+      inn.appendChild(ico);c.appendChild(inn);
     }
-  }else{c.classList.add('clickable');}
-  c.addEventListener('click',()=>onCellClick(ci,pfx,gs,isQ));
-  c.addEventListener('pointerenter',()=>{
-    if(!ST8.selectedType)return;
-    if(ST8.editTarget!==(isQ?'Q':'A'))return;
-    showPreview(ST8.selectedType,ci,pfx,gs);
-    D(`${pfx}bg${Math.floor(ci/4)}`)?.classList.add('hover-ok');
-  });
-  c.addEventListener('pointerleave',()=>{
-    clearPreview(pfx);
-    for(let b=0;b<4;b++)D(`${pfx}bg${b}`)?.classList.remove('hover-ok');
-  });
+  } else c.classList.add('clk');
+  c.onclick=()=>APP.cellClick(key,ci);
+  c.onpointerenter=()=>APP.hover(key,ci,true);
+  c.onpointerleave=()=>APP.hover(key,ci,false);
   return c;
 }
 
-function onCellClick(ci,pfx,gs,isQ){
-  AU.wake();
-  const cs=gs.cells[ci];
-  if(cs.type){
-    if(isQ&&!ST8.teacherMode)return;
-    gs.removeAt(ci);refresh(isQ?'Q':'A');return;
-  }
-  if(!ST8.selectedType)return;
-  if(ST8.editTarget!==(isQ?'Q':'A'))return;
-  doDrop(ci,ST8.selectedType,gs,pfx,isQ);
-}
+// ══════════════════════════════════════════════
+// PALETTE
+// ══════════════════════════════════════════════
+const PAL_N=['half','quarter','eighth','sixteenth'];
+const PAL_R=['half-rest','quarter-rest','eighth-rest','sixteenth-rest'];
+const palTab={q:'n',a:'n'};
 
-// ─── PREVIEW ───
-function showPreview(type,sc,pfx,gs){
-  clearPreview(pfx);if(sc<0||!type)return;
-  const d=ND[type];if(!d)return;
-  const ok=gs.canPlace(sc,type);
-  for(let i=sc;i<Math.min(sc+d.cells,16);i++){
-    const c=D(`${pfx}${i}`);if(!c)continue;c.classList.add(ok?d.pv:'pv-bad');
-  }
-}
-function clearPreview(pfx){
-  ['pv-q','pv-e','pv-s','pv-d','pv-r','pv-bad'].forEach(cls=>{
-    for(let i=0;i<16;i++)D(`${pfx}${i}`)?.classList.remove(cls);
-  });
-}
-
-// ─── DROP ───
-function doDrop(ci,type,gs,pfx,isQ){
-  const d=ND[type];
-  const bEnd=(Math.floor(ci/4)+1)*4;
-  const crossesBeat=!ST8.crossBeat&&(ci+d.cells>bEnd);
-  const occupied=gs.cells.slice(ci,Math.min(ci+d.cells,16)).some(c=>c.type);
-  const nid=gs.place(ci,type);
-  if(nid){
-    refresh(isQ?'Q':'A');
-    for(let i=ci;i<ci+d.cells;i++){const c=D(`${pfx}${i}`);if(c){c.classList.add('popin');setTimeout(()=>c.classList.remove('popin'),270);}}
-    AU.playNote(type,AU.ctx?AU.ctx.currentTime:.0);
-    if(!isQ){
-      showFB(`✓ ${d.name}（${d.cells}格）→ 第${Math.floor(ci/4)+1}拍`,'info');
-      if(AS.beatFull(Math.floor(ci/4)))showFB(`第${Math.floor(ci/4)+1}拍完整！`,'ok',2000);
-    }
-    clearPreview(pfx);
-  }else{
-    AU.ding(false);
-    if(crossesBeat&&!occupied)showFB('⛔ 音符不可跨拍！請開啟右上「跨拍」按鈕','warn',4000);
-    else showFB('此格放不下，請找空格！','hint');
-    const c=D(`${pfx}${ci}`);if(c){c.classList.add('pv-bad');setTimeout(()=>c.classList.remove('pv-bad'),480);}
-  }
-}
-
-// ─── REFRESH ───
-function refresh(target){
-  if(target==='Q'||target==='both'){
-    renderBeats(QS,'qgrid','qc',true,true);
-  }
-  if(target==='A'||target==='both'){
-    renderBeats(AS,'agrid','ac',false,true);
-  }
-}
-
-// ─── MARKER DOTS ───
-function toggleMark(ci){
-  ST8.markers[ci]=!ST8.markers[ci];
-  const dot=D(`mk${ci}`);if(dot)dot.classList.toggle('on',ST8.markers[ci]);
-  AU.wake();if(AU.ctx)AU.restTick(AU.ctx.currentTime);
-}
-
-// ─── STAMP SELECT ───
-function selectNote(type,target){
-  ST8.selectedType=type;ST8.editTarget=target;
-  document.querySelectorAll('.pi').forEach(p=>{
-    p.classList.toggle('sel',p.dataset.type===type&&p.dataset.target===target);
-  });
-  if(type){
-    const isRest=ND[type]?.isRest;
-    const prefix=target==='Q'?'t':'s';
-    const needed=isRest?'rest':'note';
-    if(palState[prefix]!==needed)switchPalTab(prefix,needed);
-  }
-  D('qcard').classList.toggle('t-active',!!type&&target==='Q');
-  D('acard').classList.toggle('s-active',!!type&&target==='A');
-}
-
-// ─── BUILD PALETTE ───
-function buildPal(types,cid,target){
-  const pal=D(cid);if(!pal)return;pal.innerHTML='';
+function buildPal(key){
+  const types=palTab[key]==='n'?PAL_N:PAL_R;
+  const con=document.getElementById(key+'pal');con.innerHTML='';
   types.forEach(type=>{
-    const d=ND[type];
-    const item=el('div','pi');item.dataset.type=type;item.dataset.target=target;
-    item.innerHTML=`<div class="pi-ico">${PICO[type](d.col)}</div><div class="pi-name">${d.name}</div>`;
-    item.addEventListener('click',()=>{
-      AU.wake();
-      if(ST8.selectedType===type&&ST8.editTarget===target)selectNote(null,'A');
-      else selectNote(type,target);
-    });
-    pal.appendChild(item);
+    const d=ND[type],colVar=COL[d.c];
+    const pi=document.createElement('div');
+    pi.className='pi';pi.dataset.type=type;pi.dataset.c=d.c;
+    pi.innerHTML=`<div class="pi-ico">${palIcoHtml(type,colVar)}</div><div class="pi-name">${d.name}</div>`;
+    pi.onclick=()=>APP.selType(key,type);
+    con.appendChild(pi);
+  });
+  const dot=document.createElement('div');
+  dot.className='pi dot-btn';dot.dataset.type='dot';dot.dataset.c='mk';
+  dot.innerHTML=`<div class="pi-ico">${DOT_SVG(COL.mk)}</div><div class="pi-name">附點</div>`;
+  dot.onclick=()=>APP.toggleDot(key);
+  con.appendChild(dot);
+  syncPalSel(key);
+}
+
+function syncPalSel(key){
+  const{selType,selDot,selKey}=APP.sel;
+  document.getElementById(key+'pal').querySelectorAll('.pi').forEach(pi=>{
+    const on=selKey===key&&pi.dataset.type===selType;
+    pi.classList.toggle('sel',on);
+    pi.classList.toggle('dotted',on&&selDot);
   });
 }
 
-const NOTES_ONLY=['quarter','eighth','dotted-eighth','sixteenth'];
-const RESTS_ONLY=['quarter-rest','eighth-rest','dotted-eighth-rest','sixteenth-rest'];
-const palState={t:'note',s:'note'};
+// ══════════════════════════════════════════════
+// CHECK: beat-level duration sequence match
+// rest ↔ note allowed if durations match per beat
+// ══════════════════════════════════════════════
+function checkAnswer(cfg){
+  if(!GS.q.notes.length){fb('先設計題目！','hint');return;}
+  if(!GS.a.hasAny()){fb('先填寫作答再驗證！','hint');return;}
 
-function switchPalTab(prefix,tab){
-  if(palState[prefix]===tab)return;
-  palState[prefix]=tab;
-
-  const noteBtn=D(`${prefix}pal-tab-note`);
-  const restBtn=D(`${prefix}pal-tab-rest`);
-  if(noteBtn)noteBtn.classList.toggle('active',tab==='note');
-  if(restBtn)restBtn.classList.toggle('active',tab==='rest');
-
-  const goingRight=(tab==='rest');
-  const wrapId=`${prefix}pal-wrap`;
-  const wrap=D(wrapId);if(!wrap)return;
-
-  const oldRow=wrap.querySelector('.pal-slide');
-  if(oldRow){
-    oldRow.classList.add(goingRight?'exit-left':'exit-right');
-    setTimeout(()=>oldRow.remove(),300);
-  }
-
-  const newRow=document.createElement('div');
-  newRow.className=`pal-slide ${goingRight?'enter-left':'enter-right'}`;
-  newRow.id=`${prefix}pal-items`;
-  const target=prefix==='t'?'Q':'A';
-  const types=tab==='note'?NOTES_ONLY:RESTS_ONLY;
-  types.forEach(type=>{
-    const d=ND[type];
-    const item=el('div','pi');item.dataset.type=type;item.dataset.target=target;
-    item.innerHTML=`<div class="pi-ico">${PICO[type](d.col)}</div><div class="pi-name">${d.name}</div>`;
-    item.addEventListener('click',()=>{
-      AU.wake();
-      if(ST8.selectedType===type&&ST8.editTarget===target)selectNote(null,'A');
-      else selectNote(type,target);
-    });
-    newRow.appendChild(item);
-  });
-  wrap.appendChild(newRow);
-
-  if(ST8.selectedType&&ST8.editTarget===target){
-    newRow.querySelectorAll('.pi').forEach(p=>{
-      p.classList.toggle('sel',p.dataset.type===ST8.selectedType);
-    });
-  }
-}
-
-// ─── PLAYBACK ───
-function playMain(){
-  AU.wake();
-  const pat=QS.pattern();
-  if(!pat.length){showFB('先設計題目！','hint');return;}
-  const go=()=>{
-    const btn=D('bbPlay');
-    if(btn) btn.textContent='▶';
-    AU.bpm=parseInt(D('bpms').value)||76;
-    if(ST8.metroSound && AU.ctx){
-      const now=AU.ctx.currentTime + 0.05;
-      const beatInterval=60/AU.bpm;
-      for(let i=0;i<4;i++)AU.click(now + i*beatInterval, i===0);
+  let allOk=true;
+  for(let beat=0;beat<cfg.beats;beat++){
+    const start=beat*cfg.spb;
+    // Build ordered duration arrays for this beat from note start cells
+    const qDurs=[],aDurs=[];
+    for(let j=start;j<start+cfg.spb;j++){
+      if(GS.q.cells[j]?.isStart) qDurs.push(ND[GS.q.cells[j].type].cells);
+      if(GS.a.cells[j]?.isStart) aDurs.push(ND[GS.a.cells[j].type].cells);
     }
-    AU.playPattern(pat,
-      (sc,dur)=>{for(let i=sc;i<sc+dur;i++){const c=D(`qc${i}`);if(!c)return;c.classList.add('playing');setTimeout(()=>c.classList.remove('playing'),(dur*AU.s16*1000)-25);}},
-      ()=>{const btn=D('bbPlay');if(btn)btn.textContent='▶';}
-    );
-  };
-  if(D('togPre').checked)AU.precount(go);else go();
-}
-
-// ─── TEACHER MODE ───
-function toggleMetro(){
-  ST8.metroSound=!ST8.metroSound;
-  renderBottomBar(ST8.currentTab);
-}
-function togglePrecount(){
-  const checkbox=D('togPre');
-  if(!checkbox)return;
-  checkbox.checked=!checkbox.checked;
-  renderBottomBar(ST8.currentTab);
-}
-function toggleToolMenu(){
-  const popup=D('toolPopup');
-  if(!popup)return;
-  popup.classList.toggle('open');
-}
-function closeToolMenu(){
-  const popup=D('toolPopup');
-  if(popup)popup.classList.remove('open');
-}
-
-function resetAnswer(){
-  AS.reset();ST8.markers.fill(false);
-  for(let i=0;i<16;i++)D(`mk${i}`)?.classList.remove('on');
-  refresh('A');for(let i=0;i<16;i++)D(`ac${i}`)?.classList.remove('c-ok','c-bad');
-  showFB('學生作答已重置','info',1800);
-}
-function clearQ(){
-  QS.reset();
-  refresh('Q');
-  selectNote(null,'Q');
-}
-
-// ─── RANDOM ───
-const QPATS=[
-  [{t:'quarter',d:4},{t:'quarter',d:4},{t:'quarter',d:4},{t:'quarter',d:4}],
-  [{t:'eighth',d:2},{t:'eighth',d:2},{t:'quarter',d:4},{t:'quarter',d:4},{t:'eighth',d:2},{t:'eighth',d:2}],
-  [{t:'quarter',d:4},{t:'eighth',d:2},{t:'eighth',d:2},{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'eighth',d:2},{t:'quarter',d:4}],
-  [{t:'eighth-rest',d:2},{t:'eighth',d:2},{t:'quarter',d:4},{t:'quarter-rest',d:4},{t:'quarter',d:4}],
-  [{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'eighth',d:2},{t:'eighth',d:2},{t:'quarter',d:4},{t:'eighth',d:2},{t:'eighth',d:2}],
-  [{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'quarter',d:4},{t:'eighth',d:2},{t:'eighth',d:2},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1}],
-  [{t:'quarter',d:4},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'eighth',d:2},{t:'eighth',d:2},{t:'quarter',d:4}],
-  [{t:'eighth-rest',d:2},{t:'eighth',d:2},{t:'eighth-rest',d:2},{t:'eighth',d:2},{t:'eighth-rest',d:2},{t:'eighth',d:2},{t:'quarter',d:4}],
-  [{t:'sixteenth',d:1},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'dotted-eighth',d:3},{t:'sixteenth',d:1},{t:'sixteenth',d:1},{t:'eighth',d:2},{t:'quarter',d:4}],
-];
-function newRandom(){
-  QS.reset();
-  const raw=QPATS[Math.floor(Math.random()*QPATS.length)];
-  let cell=0;raw.forEach(n=>{if(cell+n.d<=16){QS.place(cell,n.t,true);cell+=n.d;}});
-  while(cell<16){
-    const fill='sixteenth';
-    QS.place(cell,fill,true);
-    cell+=1;
+    const beatOk=JSON.stringify(qDurs)===JSON.stringify(aDurs);
+    if(!beatOk)allOk=false;
+    document.getElementById(`${beat===0?'a':'a'}bg${beat}`)?.classList.toggle('correct',beatOk);
+    document.getElementById(`abg${beat}`)?.classList.toggle('correct',beatOk);
   }
-  if(ST8.currentTab==='Q'){
-    switchTab('Q');
-    selectNote(null,'Q');
-    refresh('Q');
-    renderBottomBar('Q');
-  } else {
-    refresh('Q');
-    selectNote(null,'A');
-    renderBottomBar('A');
-  }
-}
 
-// ─── CHECK ANSWER ───
-function checkAnswer(){
-  if(!QS.notes.length){showFB('先設計題目！','hint');return;}
-  if(!AS.isFull()){showFB('請填滿所有16格再檢查！','hint');return;}
-  let ok=true;
-  for(let i=0;i<16;i++){
-    const match=QS.cells[i].type===AS.cells[i].type;
-    if(!match)ok=false;
-    const c=D(`ac${i}`);if(!c)continue;
+  // cell highlight: mark each cell ok/bad based on duration match at that position
+  for(let i=0;i<cfg.total;i++){
+    const qT=GS.q.cells[i].type,aT=GS.a.cells[i].type;
+    const qD=qT?ND[qT].cells:0,aD=aT?ND[aT].cells:0;
+    // ok if: both empty, exact match, or same duration (rest↔note ok)
+    const ok=(qT===aT)||(qT&&aT&&qD===aD);
+    const c=document.getElementById(`a${i}`);if(!c)continue;
     c.classList.remove('c-ok','c-bad');
-    if(match)c.classList.add('c-ok');
+    if(ok)c.classList.add('c-ok');
     else{c.classList.add('c-bad');setTimeout(()=>c.classList.remove('c-bad'),480);}
   }
-  for(let beat=0;beat<4;beat++){
-    const grp=D(`acbg${beat}`);
-    if(!grp)continue;
-    const beatOk=Array.from({length:4},(_,i)=>QS.cells[beat*4+i].type===AS.cells[beat*4+i].type).every(Boolean);
-    grp.classList.toggle('correct',beatOk);
+
+  AU.ding(allOk);
+  if(allOk){fb('完全正確！🎉','ok',3500);confetti();}
+  else fb('節奏有些不對，繼續努力！','hint',3000);
+}
+
+// ══════════════════════════════════════════════
+// APP
+// ══════════════════════════════════════════════
+const APP={
+  tab:'q',ts:'4/4',cfg:TS['4/4'],
+  sel:{selType:null,selDot:false,selKey:null},
+  markers:Array(16).fill(false),
+  metroOn:false,
+
+  setTS(ts,btn){
+    this.ts=ts;this.cfg=TS[ts];
+    document.querySelectorAll('.ts-btn').forEach(b=>b.classList.toggle('on',b===btn));
+    document.getElementById('qlbl').textContent=ts;
+    document.getElementById('albl').textContent=ts;
+    GS.q.resize(this.cfg.total);GS.a.resize(this.cfg.total);
+    this.markers=Array(this.cfg.total).fill(false);
+    renderGrid('q',false,this.cfg);renderGrid('a',true,this.cfg);
+    this.sel={selType:null,selDot:false,selKey:null};
+    syncPalSel('q');syncPalSel('a');
+  },
+
+  switchTab(key){
+    this.tab=key;
+    document.getElementById('qcard').style.display=key==='q'?'block':'none';
+    document.getElementById('acard').style.display=key==='a'?'block':'none';
+    document.getElementById('tab-q').className='bb'+(key==='q'?' tab-on':'');
+    document.getElementById('tab-a').className='bb'+(key==='a'?' tab-on':'');
+    this.renderBar();
+  },
+
+  palTab(key,tab){
+    palTab[key]=tab;
+    document.getElementById(key+'tabs').querySelectorAll('.pal-tab').forEach((b,i)=>{
+      b.classList.toggle('on',i===(tab==='n'?0:1));
+    });
+    buildPal(key);
+  },
+
+  // FIX: selecting a new note always resets dot to false
+  selType(key,type){
+    AU.wake();
+    const s=this.sel;
+    if(s.selType===type&&s.selKey===key){
+      s.selType=null;s.selDot=false;s.selKey=null;
+    } else {
+      s.selType=type;s.selDot=false;// ← always reset dot when picking new note
+      s.selKey=key;
+    }
+    document.getElementById('qcard').classList.toggle('q-on',!!s.selType&&key==='q');
+    document.getElementById('acard').classList.toggle('a-on',!!s.selType&&key==='a');
+    syncPalSel(key);syncPalSel(key==='q'?'a':'q');
+  },
+
+  toggleDot(key){
+    AU.wake();
+    const s=this.sel;
+    if(!s.selType||s.selKey!==key){fb('請先選擇一個音符或休止符','hint');return;}
+    if(!DOTMAP[s.selType]&&!UNDOTMAP[s.selType]){fb('此音符無法附點','hint');return;}
+    s.selDot=!s.selDot;
+    syncPalSel(key);
+  },
+
+  effective(){
+    const{selType,selDot}=this.sel;
+    if(!selType)return null;
+    return(selDot&&DOTMAP[selType])?DOTMAP[selType]:selType;
+  },
+
+  cellClick(key,ci){
+    AU.wake();
+    const gs=GS[key];
+    if(gs.cells[ci].type){
+      const sc=gs.noteStart(ci);
+      gs.removeAt(ci);
+      renderGrid(key,key==='a',this.cfg);
+      if(this.sel.selType&&this.sel.selKey===key)this._drop(key,sc);
+      return;
+    }
+    if(!this.sel.selType||this.sel.selKey!==key)return;
+    this._drop(key,ci);
+  },
+
+  hover(key,ci,on){
+    if(!on){this._clearPv(key);return;}
+    const type=this.effective();
+    if(!type||this.sel.selKey!==key)return;
+    const d=ND[type],ok=GS[key].canPlace(ci,type);
+    for(let i=ci;i<Math.min(ci+d.cells,GS[key].cells.length);i++)
+      document.getElementById(`${key}${i}`)?.classList.add(ok?'pv-ok':'pv-bad');
+  },
+
+  _clearPv(key){
+    GS[key].cells.forEach((_,i)=>document.getElementById(`${key}${i}`)?.classList.remove('pv-ok','pv-bad'));
+  },
+
+  _drop(key,ci){
+    const type=this.effective();if(!type)return;
+    const gs=GS[key],nid=gs.place(ci,type);
+    if(nid){
+      renderGrid(key,key==='a',this.cfg);
+      const d=ND[type];
+      for(let i=ci;i<ci+d.cells;i++){
+        const c=document.getElementById(`${key}${i}`);
+        c?.classList.add('popin');setTimeout(()=>c?.classList.remove('popin'),230);
+      }
+      AU.playNote(type,AU.ctx?AU.ctx.currentTime:0);
+      this._clearPv(key);
+      const b=Math.floor(ci/this.cfg.spb);
+      if(key==='a'&&gs.beatFull(b,this.cfg.spb))fb(`第${b+1}拍完整！`,'ok',1800);
+    } else {
+      AU.ding(false);fb('此格放不下！','hint');
+    }
+  },
+
+  play(key){
+    AU.wake();
+    const pat=GS[key].pattern();
+    if(!pat.length){fb('先放音符再播放！','hint');return;}
+    const go=()=>{
+      AU.playPattern(pat,
+        (sc,dur)=>{
+          for(let i=sc;i<sc+dur;i++){
+            const c=document.getElementById(`${key}${i}`);
+            if(c){c.classList.add('playing');setTimeout(()=>c.classList.remove('playing'),dur*AU.s16()*1000-25);}
+          }
+        },
+        ()=>{},
+        this.metroOn,
+        this.cfg.spb
+      );
+    };
+    if(document.getElementById('togPre').checked)AU.precount(this.cfg.beats,go);else go();
+  },
+
+  check(){checkAnswer(this.cfg);},
+
+  random(){
+    GS.q.reset();
+    const pool=['half','quarter','quarter','eighth','eighth','sixteenth','half-rest','quarter-rest','eighth-rest'];
+    const{spb,total}=this.cfg;let idx=0;
+    while(idx<total){
+      const rem=spb-(idx%spb);
+      const valid=pool.filter(t=>ND[t]&&ND[t].cells<=rem);
+      const choice=valid[~~(Math.random()*valid.length)]||'sixteenth';
+      GS.q.place(idx,choice,true);idx+=ND[choice].cells;
+    }
+    renderGrid('q',false,this.cfg);
+    this.sel={selType:null,selDot:false,selKey:null};
+    syncPalSel('q');syncPalSel('a');
+    fb('新題目已生成','info',1500);
+  },
+
+  clearQ(){
+    GS.q.reset();renderGrid('q',false,this.cfg);
+    this.sel.selType=null;syncPalSel('q');
+    document.getElementById('qcard').classList.remove('q-on');
+  },
+  clearA(){
+    GS.a.reset();this.markers.fill(false);
+    GS.a.cells.forEach((_,i)=>document.getElementById(`mk${i}`)?.classList.remove('on'));
+    renderGrid('a',true,this.cfg);
+    GS.a.cells.forEach((_,i)=>document.getElementById(`a${i}`)?.classList.remove('c-ok','c-bad'));
+    for(let b=0;b<this.cfg.beats;b++)document.getElementById(`abg${b}`)?.classList.remove('correct');
+    fb('作答已清除','info',1600);
+  },
+
+  toggleMetro(){this.metroOn=!this.metroOn;this.renderBar();},
+  togglePre(){const c=document.getElementById('togPre');c.checked=!c.checked;this.renderBar();},
+
+  renderBar(){
+    const key=this.tab,bar=document.getElementById('bar-r');
+    const pre=document.getElementById('togPre')?.checked,mo=this.metroOn;
+    const tools=`<button class="bb ${mo?'on':''}" onclick="APP.toggleMetro()">節拍器</button><button class="bb ${pre?'on':''}" onclick="APP.togglePre()">預備拍</button>`;
+    if(key==='q'){
+      bar.innerHTML=`${tools}<button class="bb" onclick="APP.clearQ()">清除</button><button class="bb" onclick="APP.random()">隨機</button><button class="bb play" onclick="APP.play('q')" title="播放題目">▶</button>`;
+    } else {
+      bar.innerHTML=`${tools}<button class="bb" onclick="APP.clearA()">清除</button><button class="bb check" onclick="APP.check()">驗證</button><button class="bb" onclick="APP.random()">隨機</button><button class="bb play" onclick="APP.play('q')" title="播放題目">▶</button><button class="bb play play-a" onclick="APP.play('a')" title="播放作答">♪</button>`;
+    }
   }
-  if(ok){AU.ding(true);} else {AU.ding(false);}
-}
+};
 
-// ─── FEEDBACK ───
+// FEEDBACK + CONFETTI
 let fbT=null;
-function showFB(msg,type='info',dur=3500){
-  const e=D('fbmsg');e.className=`fbmsg ${type} show`;
-  D('fbico').textContent=type==='ok'?'🎉':type==='warn'?'⛔':type==='hint'?'⚠️':'💡';
-  D('fbtxt').textContent=msg;
-  if(fbT)clearTimeout(fbT);fbT=setTimeout(()=>e.classList.remove('show'),dur);
+function fb(msg,type='info',dur=3000){
+  const e=document.getElementById('fb');
+  e.className=`fbmsg ${type} show`;
+  document.getElementById('fbico').textContent=type==='ok'?'🎉':type==='warn'?'⛔':type==='hint'?'⚠️':'💡';
+  document.getElementById('fbtxt').textContent=msg;
+  if(fbT)clearTimeout(fbT);
+  fbT=setTimeout(()=>e.classList.remove('show'),dur);
 }
-
-// ─── CONFETTI ───
 function confetti(){
   const cols=['var(--q)','var(--e)','var(--sv)','var(--de)','var(--ok)','#fff'];
-  for(let i=0;i<28;i++){
+  for(let i=0;i<32;i++){
     const p=document.createElement('div');p.className='cf';
-    p.style.cssText=`left:${Math.random()*100}vw;top:-5px;background:${cols[~~(Math.random()*cols.length)]};animation-duration:${.55+Math.random()*1}s;animation-delay:${Math.random()*.25}s;width:${5+~~(Math.random()*5)}px;height:${5+~~(Math.random()*5)}px`;
-    document.body.appendChild(p);setTimeout(()=>p.remove(),2000);
+    p.style.cssText=`left:${Math.random()*100}vw;top:-5px;background:${cols[~~(Math.random()*cols.length)]};animation-duration:${.6+Math.random()}s;animation-delay:${Math.random()*.35}s;width:${5+~~(Math.random()*5)}px;height:${5+~~(Math.random()*5)}px`;
+    document.body.appendChild(p);setTimeout(()=>p.remove(),2200);
   }
 }
 
-// ─── CROSS-BEAT ───
-function toggleCross(){
-  ST8.crossBeat=!ST8.crossBeat;
-  refresh('both');
-  renderBottomBar(ST8.currentTab);
-}
-
-// ─── INIT ───
-function switchTab(t){
-  ST8.currentTab = t;
-  document.getElementById('qcard').style.display = t==='Q'?'block':'none';
-  document.getElementById('acard').style.display = t==='A'?'block':'none';
-  renderBottomBar(t);
-}
-
-function syncBPM(value){
-  const v = Math.max(40, Math.min(200, parseInt(value) || 76));
-  D('bpms').value = v;
-  D('bpminput').value = v;
-  AU.bpm = v;
-}
-
-function renderBottomBar(tab){
-  ST8.currentTab = tab;
-  const center = D('bbCenter');
-  const right = D('bbRight');
-  if(!center||!right)return;
-  const activeQ = tab==='Q' ? 'active' : '';
-  const activeA = tab==='A' ? 'active' : '';
-  center.innerHTML = `
-    <button class="bb-btn ${activeQ}" onclick="switchTab('Q')">題目節奏</button>
-    <button class="bb-btn ${activeA}" onclick="switchTab('A')">立即測驗</button>
-  `;
-  const toolMenu = `
-    <button class="bb-btn ${ST8.crossBeat ? 'active' : ''}" onclick="toggleCross();toggleToolMenu()">跨拍 ${ST8.crossBeat ? '開' : '關'}</button>
-    <button class="bb-btn ${ST8.metroSound ? 'active' : ''}" onclick="toggleMetro();toggleToolMenu()">節拍器</button>
-    <button class="bb-btn ${D('togPre')?.checked ? 'active' : ''}" onclick="togglePrecount();toggleToolMenu()">預備拍</button>
-  `;
-  if(tab==='Q'){
-    right.innerHTML = `
-      <button class="bb-btn tool-btn" onclick="toggleToolMenu()">工具</button>
-      <div class="tool-popup" id="toolPopup">${toolMenu}</div>
-      <button class="bb-btn" onclick="clearQ()">清除</button>
-      <button class="bb-btn" onclick="newRandom()">隨機</button>
-      <button class="bb-btn primary" id="bbPlay" onclick="playMain()">▶</button>
-    `;
-  } else {
-    right.innerHTML = `
-      <button class="bb-btn tool-btn" onclick="toggleToolMenu()">工具</button>
-      <div class="tool-popup" id="toolPopup">${toolMenu}</div>
-      <button class="bb-btn" onclick="resetAnswer()">清除</button>
-      <button class="bb-btn check" onclick="checkAnswer()">驗證</button>
-      <button class="bb-btn" onclick="newRandom()">隨機</button>
-      <button class="bb-btn primary" id="bbPlay" onclick="playMain()">▶</button>
-    `;
-  }
-}
-
-function init(){
+document.addEventListener('DOMContentLoaded',()=>{
   AU.init();
-  buildPal(NOTES_ONLY,'tpal-items','Q');
-  buildPal(NOTES_ONLY,'spal-items','A');
-  refresh('both');
-  D('bpms').addEventListener('input',e=>syncBPM(e.target.value));
-  D('bpminput').addEventListener('change',e=>syncBPM(e.target.value));
-  D('bpminput').addEventListener('keydown',e=>{
-    if(e.key==='ArrowUp'||e.key==='ArrowDown'){
-      let v=parseInt(D('bpminput').value)||76;
-      v = e.key==='ArrowUp' ? Math.min(200,v+1) : Math.max(40,v-1);
-      syncBPM(v);
-      e.preventDefault();
+  buildPal('q');buildPal('a');
+  renderGrid('q',false,APP.cfg);renderGrid('a',true,APP.cfg);
+  APP.switchTab('q');
+  fb('選音符 → 點格子放置；再點已填格子可替換','info',5000);
+  const sl=document.getElementById('bsl'),nm=document.getElementById('bnum');
+  const syncBPM=v=>{v=Math.max(30,Math.min(200,parseInt(v)||72));sl.value=v;nm.value=v;};
+  sl.oninput=e=>syncBPM(e.target.value);
+  nm.onchange=e=>syncBPM(e.target.value);
+  nm.onkeydown=e=>{if(e.key==='ArrowUp'||e.key==='ArrowDown'){syncBPM(parseInt(nm.value)+(e.key==='ArrowUp'?1:-1));e.preventDefault();}};
+  document.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){
+      APP.sel.selType=null;APP.sel.selDot=false;
+      syncPalSel('q');syncPalSel('a');
+      document.getElementById('qcard').classList.remove('q-on');
+      document.getElementById('acard').classList.remove('a-on');
     }
   });
-  document.addEventListener('click',e=>{if(!e.target.closest('#bottomBar'))closeToolMenu();});
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')selectNote(null,'A');});
   document.addEventListener('pointerdown',()=>AU.wake(),{passive:true});
-  switchTab('Q');
-}
-document.addEventListener('DOMContentLoaded',init);
+});
 </script>
 </body>
 </html>
