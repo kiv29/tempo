@@ -75,11 +75,14 @@ button{cursor:pointer;font-family:inherit}
 .pal-tab:hover{background:var(--s3);color:var(--tx2)}
 .pal-tab.on.t-n{background:rgba(112,192,255,.14);border-color:rgba(112,192,255,.45);color:var(--q)}
 .pal-tab.on.t-r{background:rgba(138,167,212,.14);border-color:rgba(138,167,212,.45);color:var(--r)}
-.pal-items{display:flex;gap:5px;overflow-x:auto;padding-bottom:3px;flex:1;-webkit-overflow-scrolling:touch;align-items:flex-start}
+.pal-items-wrap{flex:1;position:relative;min-width:0}
+.pal-items{display:flex;gap:5px;overflow-x:auto;padding:2px 14px 5px 2px;-webkit-overflow-scrolling:touch;align-items:flex-start;scroll-snap-type:x proximity}
 .pal-items::-webkit-scrollbar{height:3px}.pal-items::-webkit-scrollbar-thumb{background:var(--br3);border-radius:2px}
+.pal-items-wrap::after{content:'';position:absolute;right:0;top:0;bottom:5px;width:22px;
+  background:linear-gradient(to right,transparent,var(--s1) 88%);pointer-events:none;border-radius:0 12px 12px 0}
 .pi{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:5px;
   background:var(--s1);border:1px solid var(--br);border-radius:10px;padding:9px 6px 7px;
-  cursor:pointer;user-select:none;flex-shrink:0;width:82px;min-height:96px;
+  cursor:pointer;user-select:none;flex-shrink:0;width:82px;min-height:96px;scroll-snap-align:start;
   -webkit-tap-highlight-color:transparent;position:relative;transition:all .18s}
 .pi:active{transform:scale(.97)}.pi.sel{transform:scale(1.04);z-index:2}
 .pi[data-c="h"]{border-color:rgba(248,184,108,.25)}.pi[data-c="h"]:hover,.pi[data-c="h"].sel{border-color:var(--h);box-shadow:0 0 0 2px var(--ha)}
@@ -147,12 +150,44 @@ button{cursor:pointer;font-family:inherit}
   .beat-area{grid-template-columns:repeat(2,1fr)!important}
   .cell{min-height:42px}.nota{min-height:54px}.nota svg{height:50px}
 }
+/* ── Desktop / large-screen responsive scale-up ── */
+@media(min-width:900px){
+  #main{max-width:1320px;width:min(96%,1320px);padding:22px 22px 96px}
+  .logo{font-size:18px}
+  .ts-btn{padding:7px 13px;font-size:12px}
+  .sec-card{padding:22px;border-radius:20px}
+  .sec-lbl{font-size:11px;margin-bottom:14px}
+  .cell{min-height:64px;border-radius:7px}
+  .bgrp-lbl{font-size:9.5px;padding:5px 0 4px}
+  .nota{min-height:78px;padding:6px 4px 8px}
+  .nota svg{height:72px}
+  .cico{width:28px;height:28px}
+  .mdk{min-height:30px}
+  .pal-row{gap:8px;margin-top:14px}
+  .pal-tab{width:46px;height:46px;border-radius:10px}
+  .pi{width:96px;min-height:110px;padding:11px 7px 9px;border-radius:12px}
+  .pi-ico{width:48px;height:48px}
+  .pi-name{font-size:10px}
+  .pi.dot-btn{width:78px;min-height:94px}
+  .bb{padding:8px 14px;font-size:12.5px;border-radius:9px}
+  .bb.play{width:50px;height:50px;font-size:18px}
+  .bpm-sl{width:130px}
+  #bar{padding:11px 22px 15px}
+}
+@media(min-width:1300px){
+  #main{max-width:1520px;width:min(94%,1520px)}
+  .cell{min-height:74px}
+  .nota{min-height:88px}
+  .nota svg{height:82px}
+  .pi{width:104px;min-height:118px}
+  .pi-ico{width:52px;height:52px}
+}
 </style>
 </head>
 <body>
 <div id="precount"><div><div class="pcn" id="pcn">1</div><div class="pcsub">預備拍</div></div></div>
 <header id="hdr">
-  <div class="logo"><span>節拍訓練</span></div>
+  <div class="logo">節奏 <span>Rhythm</span></div>
   <div class="hdr-sep"></div>
   <span style="font-size:10px;color:var(--tx3);font-family:'Space Mono',monospace">拍號</span>
   <button class="ts-btn on" onclick="APP.setTS('4/4',this)">4/4</button>
@@ -173,7 +208,7 @@ button{cursor:pointer;font-family:inherit}
           <svg width="13" height="19" viewBox="0 0 24 38" fill="none"><path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
-      <div class="pal-items" id="qpal"></div>
+      <div class="pal-items-wrap"><div class="pal-items" id="qpal"></div></div>
     </div>
   </div>
   <div class="sec-card" id="acard" style="display:none">
@@ -188,7 +223,7 @@ button{cursor:pointer;font-family:inherit}
           <svg width="13" height="19" viewBox="0 0 24 38" fill="none"><path d="M5 5 L19 13 L5 18 L19 27 L11 36" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </button>
       </div>
-      <div class="pal-items" id="apal"></div>
+      <div class="pal-items-wrap"><div class="pal-items" id="apal"></div></div>
     </div>
   </div>
 </main>
@@ -338,36 +373,33 @@ function palIcoHtml(type,colVar){
 
 // ══════════════════════════════════════════════
 // NOTATION SVG per beat
-// Rules:
-//  - Only notes whose isStart is within [start,end) are drawn
-//  - visSpan = slots this note occupies inside this beat (for layout only)
-//  - Beaming: only realCells<=2 notes that are directly adjacent (no gap)
-//  - dotted-eighth (realCells=3) is NOT beamable; draws isolated flag
-//  - sixteenth adjacent to dotted-eighth: each draws own flags (no beam)
+// beatSVG correctly handles notes that START in this beat
+// (span capped at beat boundary for display only)
 // ══════════════════════════════════════════════
 function beatSVG(gs,beatIdx,cfg){
   const W=86,H=58,SY=44,ST=12,BH=4;
-  const{spb}=cfg;
+  const {spb}=cfg;
   const start=beatIdx*spb,end=start+spb;
   const CW=(W-6)/spb;
   const NRX=4.5,NRY=3;
-
-  // Collect notes starting in this beat — iterate by slots, skip continuations
   const notes=[];
+
+  // collect notes whose START cell is in this beat
   for(let i=start;i<end;){
     const c=gs.cells[i];
     if(c.type&&c.isStart){
-      const d=ND[c.type];
-      const visSpan=Math.min(d.cells,end-i); // slots within this beat
-      notes.push({type:c.type,offset:i-start,visSpan,realCells:d.cells,rest:d.rest});
-      i+=d.cells; // skip entire note (may skip past end, that's fine)
-    } else {
-      i++;
-    }
+      // real duration of note (may extend beyond beat boundary)
+      const realCells=ND[c.type].cells;
+      // visual span within this beat only
+      const visSpan=Math.min(realCells,end-i);
+      notes.push({type:c.type,offset:i-start,visSpan,realCells,rest:ND[c.type].rest});
+      i+=visSpan;
+    } else i++;
   }
 
-  // Position: notehead center based on visSpan (what's visible in this beat)
   const pos=notes.map(n=>{
+    // center notehead based on real note duration scaled to CW
+    // but clamp display width to visSpan
     const nx=3+n.offset*CW+n.visSpan*CW*.44;
     return{...n,nx,sx:nx+NRX+1};
   });
@@ -378,50 +410,33 @@ function beatSVG(gs,beatIdx,cfg){
   const pitch=pos.filter(n=>!n.rest);
   const rests=pos.filter(n=>n.rest);
 
-  // Beam groups: only realCells===1 or realCells===2 (eighth, sixteenth)
-  // dotted-eighth (realCells=3) never beams
-  // Two notes beam only if they are slot-adjacent AND both realCells<=2
-  const beamPairs=new Set(); // store index pairs as "i-j"
+  // beam detection: adjacent eighth/sixteenth within the beat
+  // only beam notes with realCells<=2 that are consecutive (by offset)
+  const beamable=pitch.filter(n=>n.realCells<=2);
   const inBeam=new Set();
-  for(let i=0;i<pitch.length-1;i++){
-    const a=pitch[i],b=pitch[i+1];
-    const adjBySlot=(a.offset+a.visSpan===b.offset);
-    if(adjBySlot&&a.realCells<=2&&b.realCells<=2){
-      inBeam.add(a);inBeam.add(b);
-      beamPairs.add(i+'-'+(i+1));
-    }
+  for(let i=0;i<beamable.length-1;i++){
+    const a=beamable[i],b=beamable[i+1];
+    // consecutive by offset within beat
+    if(a.offset+a.visSpan===b.offset){inBeam.add(a);inBeam.add(b);}
   }
 
-  // Draw noteheads, dots, stems, flags
+  // noteheads + stems
   pitch.forEach(n=>{
     const{nx,sx,type,realCells}=n;
     const dot=type.startsWith('dotted-');
     const open=type==='half'||type==='dotted-half';
-    // notehead
     if(open) s+=`<ellipse cx="${f(nx)}" cy="${SY}" rx="${NRX}" ry="${NRY}" transform="rotate(-12 ${f(nx)} ${SY})" stroke="currentColor" stroke-width="1.7" fill="none"/>`;
     else     s+=`<ellipse cx="${f(nx)}" cy="${SY}" rx="${NRX}" ry="${NRY}" transform="rotate(-12 ${f(nx)} ${SY})" fill="currentColor"/>`;
-    // augmentation dot
-    if(dot) s+=`<circle cx="${f(nx+NRX+4)}" cy="${f(SY-2.5)}" r="2.3" fill="currentColor"/>`;
-    // stem (all non-whole notes)
+    if(dot)  s+=`<circle cx="${f(nx+NRX+4)}" cy="${f(SY-2.5)}" r="2.3" fill="currentColor"/>`;
     s+=`<line x1="${f(sx)}" y1="${f(SY-NRY+.5)}" x2="${f(sx)}" y2="${ST}" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/>`;
-    // Isolated flags (not in beam)
+    // flags for notes not in beam group
     if(!inBeam.has(n)){
-      if(realCells<=2){
-        // primary flag (eighth or dotted-eighth)
-        s+=`<path d="M${f(sx)} ${ST} Q${f(sx+11)} ${ST+7} ${f(sx)} ${ST+18}" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/>`;
-      }
-      if(realCells===1){
-        // secondary flag (sixteenth)
-        s+=`<path d="M${f(sx)} ${ST+10} Q${f(sx+11)} ${ST+17} ${f(sx)} ${ST+27}" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/>`;
-      }
-      if(realCells===3){
-        // dotted-eighth: one flag (like eighth) — never beams
-        s+=`<path d="M${f(sx)} ${ST} Q${f(sx+11)} ${ST+7} ${f(sx)} ${ST+18}" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/>`;
-      }
+      if(realCells<=2) s+=`<path d="M${f(sx)} ${ST} Q${f(sx+11)} ${ST+7} ${f(sx)} ${ST+18}" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/>`;
+      if(realCells===1) s+=`<path d="M${f(sx)} ${ST+10} Q${f(sx+11)} ${ST+17} ${f(sx)} ${ST+27}" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round"/>`;
     }
   });
 
-  // Draw rests
+  // rests
   rests.forEach(({type,nx})=>{
     const dot=type.startsWith('dotted-');
     const base=type.replace('dotted-','').replace('-rest','');
@@ -441,15 +456,25 @@ function beatSVG(gs,beatIdx,cfg){
     if(dot) s+=`<circle cx="${f(nx+9)}" cy="${SY-5}" r="2.3" fill="currentColor"/>`;
   });
 
-  // Draw beams between adjacent beamable pairs
-  for(let i=0;i<pitch.length-1;i++){
-    if(!beamPairs.has(i+'-'+(i+1))) continue;
-    const a=pitch[i],b=pitch[i+1];
-    // Primary beam (always)
-    s+=`<rect x="${f(a.sx)}" y="${f(ST-.5)}" width="${f(b.sx-a.sx)}" height="${BH}" rx="1.5" fill="currentColor"/>`;
-    // Secondary beam only if BOTH are sixteenth (realCells===1)
-    if(a.realCells===1&&b.realCells===1)
-      s+=`<rect x="${f(a.sx)}" y="${f(ST+BH+4)}" width="${f(b.sx-a.sx)}" height="${BH}" rx="1.5" fill="currentColor"/>`;
+  // beams between adjacent pairs — primary beam always connects consecutive
+  // beamed notes; secondary (16th-note) beam is drawn per-note as a full
+  // segment when BOTH neighbours are 16th notes, or as a short stub on the
+  // side of a lone 16th note next to an 8th note, so 16-8-16 patterns are
+  // visually distinct from 8-8-8.
+  const STUB=7;
+  for(let i=0;i<beamable.length-1;i++){
+    const a=beamable[i],b=beamable[i+1];
+    if(a.offset+a.visSpan===b.offset){
+      s+=`<rect x="${f(a.sx)}" y="${f(ST-.5)}" width="${f(b.sx-a.sx)}" height="${BH}" rx="1.5" fill="currentColor"/>`;
+      const aIs16=a.realCells===1,bIs16=b.realCells===1;
+      if(aIs16&&bIs16){
+        s+=`<rect x="${f(a.sx)}" y="${f(ST+BH+4)}" width="${f(b.sx-a.sx)}" height="${BH}" rx="1.5" fill="currentColor"/>`;
+      } else if(aIs16){
+        s+=`<rect x="${f(a.sx)}" y="${f(ST+BH+4)}" width="${STUB}" height="${BH}" rx="1.5" fill="currentColor"/>`;
+      } else if(bIs16){
+        s+=`<rect x="${f(b.sx-STUB)}" y="${f(ST+BH+4)}" width="${STUB}" height="${BH}" rx="1.5" fill="currentColor"/>`;
+      }
+    }
   }
   return s+'</svg>';
 }
@@ -466,24 +491,14 @@ function mkGrid(total=16){
     get notes(){return notes;},
     resize(n){cells=Array(n).fill(null).map(()=>({type:null,nid:null,isStart:false}));notes=[];},
     reset(){cells.forEach(c=>{c.type=null;c.nid=null;c.isStart=false;});notes.length=0;},
-    canPlace(sc,type,spb=4){
-      const d=ND[type];
-      if(!d||sc<0||sc+d.cells>cells.length) return false;
-      // enforce: note must start and end within the same beat
-      const beatEnd=Math.floor(sc/spb)*spb+spb;
-      if(sc+d.cells>beatEnd) return false;
-      for(let i=sc;i<sc+d.cells;i++) if(cells[i].type) return false;
+    canPlace(sc,type){
+      const d=ND[type];if(!d||sc<0||sc+d.cells>cells.length)return false;
+      for(let i=sc;i<sc+d.cells;i++)if(cells[i].type)return false;
       return true;
     },
-    place(sc,type,force=false,spb=4){
-      const d=ND[type]; if(!d) return null;
-      if(!force){
-        if(!this.canPlace(sc,type,spb)) return null;
-      } else {
-        // force mode: still check bounds and empty cells, but skip beat-boundary check
-        if(sc<0||sc+d.cells>cells.length) return null;
-        for(let i=sc;i<sc+d.cells;i++) if(cells[i].type) return null;
-      }
+    place(sc,type,force=false){
+      if(!force&&!this.canPlace(sc,type))return null;
+      const d=ND[type];
       const nid='n'+Date.now().toString(36)+Math.random().toString(36).slice(2,4);
       notes.push({id:nid,type,startCell:sc,duration:d.cells});
       for(let i=sc;i<sc+d.cells;i++)cells[i]={type,nid,isStart:i===sc};
@@ -706,9 +721,17 @@ const APP={
     const gs=GS[key];
     if(gs.cells[ci].type){
       const sc=gs.noteStart(ci);
+      const existingType=gs.cells[sc].type;
+      const wantType=(this.sel.selType&&this.sel.selKey===key)?this.effective():null;
       gs.removeAt(ci);
-      renderGrid(key,key==='a',this.cfg);
-      if(this.sel.selType&&this.sel.selKey===key)this._drop(key,sc);
+      // 點擊已放置的音符：若跟目前選取的音符/休止符相同，第二次點擊即視為刪除
+      // (不再原地重新放回去)；否則才用新選取的類型替換。
+      if(wantType&&wantType!==existingType){
+        renderGrid(key,key==='a',this.cfg);
+        this._drop(key,sc);
+      } else {
+        renderGrid(key,key==='a',this.cfg);
+      }
       return;
     }
     if(!this.sel.selType||this.sel.selKey!==key)return;
@@ -719,7 +742,7 @@ const APP={
     if(!on){this._clearPv(key);return;}
     const type=this.effective();
     if(!type||this.sel.selKey!==key)return;
-    const d=ND[type],ok=GS[key].canPlace(ci,type,this.cfg.spb);
+    const d=ND[type],ok=GS[key].canPlace(ci,type);
     for(let i=ci;i<Math.min(ci+d.cells,GS[key].cells.length);i++)
       document.getElementById(`${key}${i}`)?.classList.add(ok?'pv-ok':'pv-bad');
   },
@@ -730,7 +753,7 @@ const APP={
 
   _drop(key,ci){
     const type=this.effective();if(!type)return;
-    const gs=GS[key],nid=gs.place(ci,type,false,this.cfg.spb);
+    const gs=GS[key],nid=gs.place(ci,type);
     if(nid){
       renderGrid(key,key==='a',this.cfg);
       const d=ND[type];
@@ -809,7 +832,8 @@ const APP={
     if(key==='q'){
       bar.innerHTML=`${tools}<button class="bb" onclick="APP.clearQ()">清除</button><button class="bb" onclick="APP.random()">隨機</button><button class="bb play" onclick="APP.play('q')" title="播放題目">▶</button>`;
     } else {
-      bar.innerHTML=`${tools}<button class="bb" onclick="APP.clearA()">清除</button><button class="bb check" onclick="APP.check()">驗證</button><button class="bb" onclick="APP.random()">隨機</button><button class="bb play" onclick="APP.play('q')" title="播放題目">▶</button><button class="bb play play-a" onclick="APP.play('a')" title="播放作答">♪</button>`;
+      // 順序：節拍器 / 預備拍 / 清除 / 隨機 / 驗證 / 播放(題目) / 播放(作答)
+      bar.innerHTML=`${tools}<button class="bb" onclick="APP.clearA()">清除</button><button class="bb" onclick="APP.random()">隨機</button><button class="bb check" onclick="APP.check()">驗證</button><button class="bb play" onclick="APP.play('q')" title="播放題目">▶</button><button class="bb play play-a" onclick="APP.play('a')" title="播放作答">♪</button>`;
     }
   }
 };
